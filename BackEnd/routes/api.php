@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CatalogueController;
+use App\Http\Controllers\BannerController;
 use App\Http\Controllers\Client\ClientUserController;
 use App\Models\ProductCapacity;
 use App\Models\ProductColor;
@@ -38,6 +39,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::apiResource("admin/user", UserController::class);
     Route::apiResource("admin/producCapacity", ProductCapacity::class);
     Route::apiResource("admin/productColor", ProductColor::class);
+    Route::apiResource("admin/banner", BannerController::class);
     
 
 
