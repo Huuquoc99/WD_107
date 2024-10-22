@@ -192,8 +192,40 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Product $product)
     {
-        //
+        try {
+            $dataHasImage = $product->galleries->toArray() + $product->variants->toArray();
+
+            DB::transaction(function () use ($product) {
+                $product->tags()->sync([]);
+
+                $product->galleries()->delete();
+
+                foreach ($product->variants as $variant) {
+                    $variant->orderItems()->delete();
+                }
+                $product->variants()->delete();
+
+                $product->delete();
+            }, 3);
+
+            foreach ($dataHasImage as $item) {
+                if (!empty($item->image) && Storage::exists($item->image)) {
+                    Storage::delete($item->image);
+                }
+            }
+
+            return response()->json([
+                'message' => 'Xóa sản phẩm thành công',
+                'status' => 'success'
+            ], 200);
+        } catch (\Exception $exception) {
+
+            return response()->json([
+                'message' => 'Đã xảy ra lỗi: ' . $exception->getMessage(),
+                'status' => 'error'
+            ], 500);
+        }
     }
 }
