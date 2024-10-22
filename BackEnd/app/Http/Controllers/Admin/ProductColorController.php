@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Models\ProductColor;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ProductColorController extends Controller
 {
@@ -12,7 +13,8 @@ class ProductColorController extends Controller
      */
     public function index()
     {
-        //
+        $listProductColor = ProductColor::all();
+        return response()->json($listProductColor, 200);
     }
 
     /**
