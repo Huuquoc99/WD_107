@@ -98,6 +98,13 @@ class BannerController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $banner = Banner::findOrFail($id);
+        $banner->delete();
+        if($banner->image && Storage::disk("public")->exists($banner->image))
+        {
+            Storage::disk("public")->delete($banner->image);
+        }
+
+        return response()->json(['message' => 'Banner deleted successfully']);
     }
 }
