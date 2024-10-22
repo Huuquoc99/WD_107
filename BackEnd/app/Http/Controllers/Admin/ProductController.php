@@ -44,7 +44,46 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        //
+        list(
+            $dataProduct,
+            $dataProductVariants,
+            $dataProductGalleries,
+            $dataProductTags
+            ) = $this->handleData($request);
+
+        try {
+            DB::beginTransaction();
+
+            /** @var Product $product */
+            $product = Product::query()->create($dataProduct);
+
+            foreach ($dataProductVariants as $item) {
+                $item += ['product_id' => $product->id];
+
+                ProductVariant::query()->create($item);
+            }
+
+            $product->tags()->attach($dataProductTags);
+
+            foreach ($dataProductGalleries as $item) {
+                $item += ['product_id' => $product->id];
+
+                ProductGallery::query()->create($item);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Sản phẩm đã được tạo thành công.',
+                'data' => $product->load(['variants', 'tags', 'galleries'])
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Đã xảy ra lỗi khi tạo sản phẩm.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
