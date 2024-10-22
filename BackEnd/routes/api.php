@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::apiResource("admin/user", UserController::class);
     Route::apiResource("admin/producCapacity", ProductCapacity::class);
     Route::apiResource("admin/productColor", ProductColor::class);
+    
 
 
 // Client
