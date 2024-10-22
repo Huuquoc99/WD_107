@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\ProductCapacity;
+use App\Http\Controllers\Controller;
 
 class ProductCapacityController extends Controller
 {
@@ -12,7 +13,8 @@ class ProductCapacityController extends Controller
      */
     public function index()
     {
-        //
+        $listProductCapacity = ProductCapacity::all();
+        return response()->json($listProductCapacity, 200);
     }
 
     /**
