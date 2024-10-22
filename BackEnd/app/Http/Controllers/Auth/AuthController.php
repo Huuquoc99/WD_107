@@ -74,4 +74,21 @@ class AuthController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
     }
+
+    // Đăng xuất
+    public function logout()
+    {
+        try{
+            request()->user()->currentAccessToken()->delete();
+
+            return response()->json([
+                "message" => "Logout success"
+            ]);
+
+        }catch(\Throwable $th){
+            return response()->json([
+                "errors" => $th->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
