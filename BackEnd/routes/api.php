@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Client\ClientUserController;
 
@@ -32,7 +33,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Admin
     Route::apiResource("admin/catalogue", CatalogueController::class);
-
+    Route::apiResource("users", UserController::class);
 
 // Client
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
