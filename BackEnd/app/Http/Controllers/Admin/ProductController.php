@@ -36,13 +36,13 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        return response()->json();
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
         //
     }
