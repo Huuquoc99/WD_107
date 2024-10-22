@@ -61,9 +61,17 @@ class ProductColorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProductColorRequest $request, string $id)
     {
-        //
+        $param = $request->except("_token", "_method");
+    
+        $productColor = ProductColor::findOrFail($id);
+        $productColor->update($param);
+    
+        return response()->json([
+            'message' => 'Product Color updated successfully',
+            'data' => $productColor
+        ]);
     }
 
     /**
