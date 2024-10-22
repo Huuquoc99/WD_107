@@ -106,4 +106,23 @@ class ClientUserController extends Controller
         return response()->json(['message' => 'Invalid request method'], 405);
     }
     
+
+    // Thay đổi mật khẩu
+    public function updatePassword(Request $request, string $id)
+    {
+        $validatedData = $request->validate([
+            "password" => "required|string|min:8|confirmed", 
+        ]);
+
+        if ($request->isMethod("PUT")) {
+            $user = User::findOrFail($id);
+            $param['password'] = bcrypt($validatedData['password']); 
+
+            $user->update($param);
+
+            return response()->json(['message' => 'Password updated successfully']);
+        }
+
+        return response()->json(['message' => 'Invalid request method'], 405);
+    }
 }
