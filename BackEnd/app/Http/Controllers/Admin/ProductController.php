@@ -110,9 +110,83 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Product $product)
     {
-        //
+        list(
+            $dataProduct,
+            $dataProductVariants,
+            $dataProductGalleries,
+            $dataProductTags
+            ) = $this->handleData($request);
+
+        try {
+            DB::beginTransaction();
+
+            $productImgThumbnailCurrent = $product->img_thumbnail;
+
+            $product->update($dataProduct);
+
+            $product->tags()->sync($dataProductTags);
+
+            foreach ($dataProductVariants as  $item) {
+                $existingVariant = ProductVariant::query()->where([
+                    'product_id' => $product->id,
+                    'product_capacity_id' => $item['product_capacity_id'],
+                    'product_color_id' => $item['product_color_id'],
+                ])->first();
+
+                if ($existingVariant) {
+                    if (empty($item['image'])) {
+                        $item['image'] = $existingVariant->image;
+                    }
+                    $existingVariant->update($item);
+                }
+            }
+
+            foreach ($dataProductGalleries as $item) {
+                $item += ['product_id' => $product->id];
+                ProductGallery::query()->updateOrCreate(
+                    [
+                        'id' => $item['id']
+                    ],
+                    $item
+                );
+            }
+
+            DB::commit();
+
+            if (!empty($dataProduct['img_thumbnail']) && $dataProduct['img_thumbnail'] !== $productImgThumbnailCurrent) {
+                if (!empty($productImgThumbnailCurrent) && Storage::exists($productImgThumbnailCurrent)) {
+                    Storage::delete($productImgThumbnailCurrent);
+                }
+            }
+
+            return response()->json([
+                'data' => $product->load(['variants', 'tags', 'galleries']),
+                'message' => 'Cập nhật sản phẩm thành công',
+                'status' => 'success'
+            ], 200);
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+
+            foreach ($dataProductGalleries as $item) {
+                if (!empty($item['image']) && Storage::exists($item['image'])) {
+                    Storage::delete($item['image']);
+                }
+            }
+
+            foreach ($dataProductVariants as $item) {
+                if (!empty($item['image']) && Storage::exists($item['image'])) {
+                    Storage::delete($item['image']);
+                }
+            }
+
+            return response()->json([
+                'message' => 'Đã xảy ra lỗi: ' . $exception->getMessage(),
+                'status' => 'error'
+            ], 500);
+        }
     }
 
     /**
