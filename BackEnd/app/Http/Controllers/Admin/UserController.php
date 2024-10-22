@@ -39,7 +39,12 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $users = User::findOrFail($id);
+        if($users) {
+            return response()->json($users);
+        }else{
+            return response()->json(["message" => "User not found"], 404);
+        }
     }
 
     /**
