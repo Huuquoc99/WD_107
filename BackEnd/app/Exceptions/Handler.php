@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Exceptions;
-
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+// use HttpException;
 use Throwable;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
@@ -24,7 +26,34 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            //
+            
         });
     }
+
+    // Trả ra dữ liệu json
+    protected function shouldReturnJson($request, Throwable $e)
+    {
+        return true;
+    }
+
+    // public function render($request, Throwable $exception)
+    // {
+    //     if ($exception instanceof ValidationException) {
+    //         return response()->json([
+    //             'message' => 'Dữ liệu không hợp lệ.',
+    //             'errors' => $exception->errors()
+    //         ], 422);
+    //     }
+
+    //     if ($request->expectsJson()) {
+    //         $statusCode = $exception instanceof HttpException ? $exception->getStatusCode() : 500;
+
+    //         return response()->json([
+    //             'message' => $exception->getMessage() ?: 'Đã xảy ra lỗi.',
+    //             'status' => 'error'
+    //         ], $statusCode);
+    //     }
+
+    //     return parent::render($request, $exception);
+    // }
 }
