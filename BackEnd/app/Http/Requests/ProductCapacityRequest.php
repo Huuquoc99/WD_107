@@ -11,7 +11,7 @@ class ProductCapacityRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,20 @@ class ProductCapacityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "name" => "required|max:255",
+        ];
+    }
+
+        /**
+     * Get the error message for the defined validation rules. 
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            "name.required" => "Product capacity names cannot be left blank",
+            "name.max" => "Product capacity name must not exceed 255 characters",
         ];
     }
 }
