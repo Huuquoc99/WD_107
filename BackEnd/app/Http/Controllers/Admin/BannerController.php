@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banner;
 use Illuminate\Http\Request;
 
 class BannerController extends Controller
@@ -12,7 +13,8 @@ class BannerController extends Controller
      */
     public function index()
     {
-        //
+        $listBanner = Banner::all();
+        return response()->json($listBanner, 201);
     }
 
     /**
