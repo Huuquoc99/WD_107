@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Models\ProductCapacity;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductCapacityRequest;
 
 class ProductCapacityController extends Controller
 {
@@ -60,9 +61,17 @@ class ProductCapacityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProductCapacityRequest $request, string $id)
     {
-        //
+        $param = $request->except("_token", "_method");
+    
+        $productCapacity = ProductCapacity::findOrFail($id);
+        $productCapacity->update($param);
+    
+        return response()->json([
+            'message' => 'Product Capacity updated successfully',
+            'data' => $productCapacity
+        ]);
     }
 
     /**
