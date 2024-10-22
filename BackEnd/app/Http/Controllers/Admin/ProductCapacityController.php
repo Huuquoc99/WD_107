@@ -44,7 +44,8 @@ class ProductCapacityController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $productCapacity = ProductCapacity::query()->findOrFail($id);
+        return response()->json($productCapacity);
     }
 
     /**
