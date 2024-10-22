@@ -53,7 +53,8 @@ class ProductCapacityController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $productCapacity = ProductCapacity::findOrFail($id);
+        return response()->json($productCapacity);
     }
 
     /**
