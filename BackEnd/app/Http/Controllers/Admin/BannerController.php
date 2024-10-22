@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
 {
@@ -71,7 +72,25 @@ class BannerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        if($request->isMethod("PUT"))
+        {
+            $param = $request->except("_token", "_method");
+            $banner = Banner::findOrFail($id);
+            if($request->hasFile("image")){
+                if($banner->hasFile && Storage::disk("public")->exists($banner->image))
+                {
+                    Storage::disk("public")->delete($banner->image);
+                }
+                $filepath = $request->file("image")->store("uploads/banners", "public");
+            }else{
+                $filepath = $banner->image;
+            }
+
+            $param["image"] = $filepath;
+            $banner->update($param);
+
+            return response()->json(['message' => 'Banner updated successfully']);
+        }
     }
 
     /**
