@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Client\ClientUserController;
+use App\Models\ProductCapacity;
+use App\Models\ProductColor;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +35,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Admin
     Route::apiResource("admin/catalogue", CatalogueController::class);
-    Route::apiResource("users", UserController::class);
+    Route::apiResource("admin/user", UserController::class);
+    Route::apiResource("admin/producCapacity", ProductCapacity::class);
+    Route::apiResource("admin/productColor", ProductColor::class);
+
 
 // Client
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
