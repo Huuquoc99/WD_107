@@ -65,7 +65,8 @@ class CatalogueController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $catalogue = Catalogue::findOrFail($id);
+        return response()->json($catalogue);
     }
 
     /**
