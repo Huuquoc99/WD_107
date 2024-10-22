@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
+use App\Models\ProductVariant;
 use App\Models\ProductCapacity;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductCapacityRequest;
@@ -79,6 +80,9 @@ class ProductCapacityController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        ProductVariant::query()->where("product_color_id", $id)->delete();
+        $productCapacity = ProductCapacity::query()->findOrFail($id);
+        $productCapacity->delete();
+        return response()->json(['message' => 'Product Capacity deleted successfully']);
     }
 }
