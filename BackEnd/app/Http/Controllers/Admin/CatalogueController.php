@@ -6,6 +6,7 @@ use App\Models\Catalogue;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CatalogueRequest;
+use Illuminate\Support\Facades\Storage;
 
 class CatalogueController extends Controller
 {
@@ -72,9 +73,34 @@ class CatalogueController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(CatalogueRequest $request, string $id)
     {
-        //
+        if($request->isMethod("PUT"))
+        {
+            $param = $request->except("_token", "_method");
+            $catalogue = Catalogue::findOrFail($id);
+            if($request->hasFile("cover")){
+                if($catalogue->hasFile && Storage::disk("public")->exists($catalogue->cover))
+                {
+                    Storage::disk("public")->delete($catalogue->cover);
+                }
+                $filepath = $request->file("cover")->store("uploads/catalogues", "public");
+            }else{
+                $filepath = $catalogue->cover;
+            }
+
+            $param["cover"] = $filepath;
+            $catalogue->update($param);
+
+            if($catalogue->is_active == 0)
+            {
+                $catalogue->hide();
+            }else{
+                $catalogue->show();
+            }
+
+            return response()->json(['message' => 'Catalogue updated successfully']);
+        }
     }
 
     /**
