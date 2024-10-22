@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
+    // Đăng kí
     public function register()
     {
         try{
@@ -39,4 +40,38 @@ class AuthController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     } 
+
+    // Đăng nhập
+    public function login()
+    {
+        try {
+            request()->validate([
+                "email" => "required|email",
+                "password" => "required",
+            ]);
+    
+            $user = User::where("email", request("email"))->first();
+    
+            if(!$user || !Hash::check(request("password"), $user->password)){
+                throw ValidationException::withMessages([
+                    "email" => ["The provided credentials are incorrect"],
+                ]);
+            }
+            $token = $user->createToken($user->id)->plainTextToken;
+    
+            return response()->json([
+                "token" => $token
+            ]);
+        } catch (\Throwable $th) {
+            if($th instanceof ValidationException){
+                return response()->json([
+                    "errors" => $th->errors()
+                ], Response::HTTP_BAD_REQUEST); 
+            }
+
+            return response()->json([
+                "errors" => $th->getMessage()
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+    }
 }
