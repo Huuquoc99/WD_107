@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('product_capacities', function (Blueprint $table) {
             $table->id();
+            $table->string("name", 255);
+            $table->tinyInteger("status")->default(1);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
