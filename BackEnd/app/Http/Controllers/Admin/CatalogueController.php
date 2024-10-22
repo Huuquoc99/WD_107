@@ -108,6 +108,13 @@ class CatalogueController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $catalogue = Catalogue::findOrFail($id);
+        $catalogue->delete();
+        if($catalogue->cover && Storage::disk("public")->exists($catalogue->cover))
+        {
+            Storage::disk("public")->delete($catalogue->cover);
+        }
+
+        return response()->json(['message' => 'Catalogue deleted successfully']);
     }
 }
