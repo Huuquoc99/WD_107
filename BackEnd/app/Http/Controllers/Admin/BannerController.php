@@ -77,7 +77,7 @@ class BannerController extends Controller
             $param = $request->except("_token", "_method");
             $banner = Banner::findOrFail($id);
             if($request->hasFile("image")){
-                if($banner->hasFile && Storage::disk("public")->exists($banner->image))
+                if($banner->image && Storage::disk("public")->exists($banner->image))
                 {
                     Storage::disk("public")->delete($banner->image);
                 }

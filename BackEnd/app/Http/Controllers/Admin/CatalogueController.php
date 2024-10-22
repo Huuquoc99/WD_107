@@ -80,7 +80,7 @@ class CatalogueController extends Controller
             $param = $request->except("_token", "_method");
             $catalogue = Catalogue::findOrFail($id);
             if($request->hasFile("cover")){
-                if($catalogue->hasFile && Storage::disk("public")->exists($catalogue->cover))
+                if($catalogue->cover && Storage::disk("public")->exists($catalogue->cover))
                 {
                     Storage::disk("public")->delete($catalogue->cover);
                 }
