@@ -53,7 +53,8 @@ class BannerController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $banner = Banner::query()->findOrFail($id);
+        return response()->json($banner);
     }
 
     /**
