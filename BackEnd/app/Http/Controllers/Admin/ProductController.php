@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Product;
 
 class ProductController extends Controller
 {
@@ -12,7 +13,12 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        $data = Product::query()->latest('id')->paginate(8);
+
+        return response()->json([
+            'message' => 'Sản phẩm đã được lấy thành công.',
+            'data' => $data
+        ], 200);
     }
 
     /**
