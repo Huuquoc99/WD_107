@@ -228,4 +228,48 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
+    private function handleData(Request $request)
+    {
+        $dataProduct = $request->except(['product_variants', 'tags', 'product_galleries']);
+        $dataProduct['is_active'] ??= 0;
+        $dataProduct['is_hot_deal'] ??= 0;
+        $dataProduct['is_good_deal'] ??= 0;
+        $dataProduct['is_new'] ??= 0;
+        $dataProduct['is_show_home'] ??= 0;
+        $dataProduct['slug'] = Str::slug($dataProduct['name']) . '-' . $dataProduct['sku'];
+
+        if (!empty($dataProduct['img_thumbnail'])) {
+            $dataProduct['img_thumbnail'] = Storage::put('products', $dataProduct['img_thumbnail']);
+        }
+
+        $dataProductVariantsTmp = $request->product_variants;
+        $dataProductVariants = [];
+        foreach ($dataProductVariantsTmp as $key => $item) {
+            $tmp = explode('-', $key);
+            $dataProductVariants[] = [
+                'product_capacity_id' => $tmp[0],
+                'product_color_id' => $tmp[1],
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+                'sku' => $item['sku'],
+                'status' => isset($item['status']) && $item['status'] == 1 ? 1 : 0,
+                'image' => !empty($item['image']) ? Storage::put('product_variants', $item['image']) : null
+            ];
+        }
+
+        $dataProductGalleriesTmp = $request->product_galleries ?: [];
+        $dataProductGalleries = [];
+        foreach ($dataProductGalleriesTmp as $image) {
+            if (!empty($image)) {
+                $dataProductGalleries[] = [
+                    'image' => Storage::put('product_galleries', $image)
+                ];
+            }
+        }
+
+        $dataProductTags = $request->tags;
+
+        return [$dataProduct,$dataProductVariants, $dataProductGalleries, $dataProductTags];
+    }
 }
