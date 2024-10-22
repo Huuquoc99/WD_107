@@ -30,7 +30,22 @@ class BannerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if($request->isMethod("POST"))
+        {
+            $param = $request->except("_token");
+
+            if($request->hasFile("image"))
+            {
+                $filepath = $request->file("image")->store("uploads/banners", "public");
+            }else{
+                $filepath = null;
+            }
+
+            $param["image"] = $filepath;
+            Banner::create($param);
+
+            return response()->json(['message' => 'Banner created successfully']);
+        }
     }
 
     /**
