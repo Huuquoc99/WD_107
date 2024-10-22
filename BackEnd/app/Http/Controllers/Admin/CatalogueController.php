@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Catalogue;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CatalogueRequest;
 
 class CatalogueController extends Controller
 {
@@ -30,9 +31,24 @@ class CatalogueController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CatalogueRequest $request)
     {
-        //
+         if($request->isMethod("POST"))
+        {
+            $param = $request->except("_token");
+
+            if($request->hasFile("cover"))
+            {
+                $filepath = $request->file("cover")->store("uploads/catalogues", "public");
+            }else{
+                $filepath = null;
+            }
+
+            $param["cover"] = $filepath;
+            Catalogue::create($param);
+
+            return response()->json(['message' => 'Catalogue created successfully']);
+        }
     }
 
     /**
