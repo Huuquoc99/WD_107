@@ -3,8 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreProductRequest;
+use App\Models\Catalogue;
 use App\Models\Product;
+use App\Models\ProductCapacity;
+use App\Models\ProductColor;
+use App\Models\ProductGallery;
+use App\Models\ProductVariant;
+use App\Models\Tag;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
