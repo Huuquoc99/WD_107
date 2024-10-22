@@ -11,7 +11,7 @@ class ProductColorRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,23 @@ class ProductColorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "name" => "required|max:255",
+            // "color_code" => "required|max:7",
+        ];
+    }
+
+        /**
+     * Get the error message for the defined validation rules. 
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            "name.required" => "Product Color names cannot be left blank",
+            "name.max" => "Product Color name must not exceed 255 characters",
+            // "color_code.required" => "Product Color code names cannot be left blank",
+            // "color_code.max" => "Product Color code name must not exceed 7 characters",
         ];
     }
 }
