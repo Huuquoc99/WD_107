@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\ProductColor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ProductColorRequest;
 
 class ProductColorController extends Controller
 {
@@ -28,9 +29,15 @@ class ProductColorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductColorRequest $request)
     {
-        //
+        if ($request->isMethod("POST")) {
+            $param = $request->except("_token");
+        
+            ProductColor::create($param);
+        
+            return response()->json(['message' => 'Product Color created successfully']);
+        }
     }
 
     /**
