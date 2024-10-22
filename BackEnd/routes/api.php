@@ -40,7 +40,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::apiResource("admin/producCapacity", ProductCapacity::class);
     Route::apiResource("admin/productColor", ProductColor::class);
     Route::apiResource("admin/banner", BannerController::class);
-    
+    Route::apiResource('admin/products', ProductController::class);
 
 
 // Client
