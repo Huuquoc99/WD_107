@@ -15,6 +15,10 @@ class CheckAdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if ($request->user()->is_active !== 1) { // 1 là admin
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+        
         return $next($request);
     }
 }
