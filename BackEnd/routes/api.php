@@ -1,14 +1,15 @@
 <?php
 
+use App\Models\ProductColor;
 use Illuminate\Http\Request;
+use App\Models\ProductCapacity;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Client\ClientUserController;
-use App\Models\ProductCapacity;
-use App\Models\ProductColor;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +42,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         Route::apiResource("admin/producCapacity", ProductCapacity::class);
         Route::apiResource("admin/productColor", ProductColor::class);
         Route::apiResource("admin/banner", BannerController::class);
+
+        // Comment
+        Route::get('/admin/comments', [CommentController::class, 'index']); 
+        Route::put('/admin/comments/approve/{id}', [CommentController::class, 'approve']); 
+        Route::delete('/admin/comments/{id}', [CommentController::class, 'destroy']); 
     });
 
 
