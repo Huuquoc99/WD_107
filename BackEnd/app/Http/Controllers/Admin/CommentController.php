@@ -13,4 +13,18 @@ class CommentController extends Controller
         $comment = Comment::all(); 
         return response()->json($comment, 200);
     }
+
+    public function approve($id)
+    {
+        $comment = Comment::findOrFail($id);
+
+        if ($comment->is_active == 1) {
+            return response()->json(['message' => 'Comments were previously moderated!'], 400);
+        }
+
+        $comment->is_active = 1; // Duyệt bình luận
+        $comment->save();
+
+        return response()->json(['message' => 'Comment has been approved successfully.'], 200);
+    }
 }
