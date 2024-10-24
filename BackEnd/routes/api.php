@@ -1,14 +1,15 @@
 <?php
 
+use App\Models\ProductColor;
 use Illuminate\Http\Request;
+use App\Models\ProductCapacity;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Client\ClientUserController;
-use App\Models\ProductCapacity;
-use App\Models\ProductColor;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,12 +36,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         ->name('password.reset');
 
 // Admin
-    Route::apiResource("admin/catalogue", CatalogueController::class);
-    Route::apiResource("admin/user", UserController::class);
-    Route::apiResource("admin/producCapacity", ProductCapacity::class);
-    Route::apiResource("admin/productColor", ProductColor::class);
-    Route::apiResource("admin/banner", BannerController::class);
-    
+    Route::middleware(['auth:sanctum', 'checkAdminMiddleware'])->group(function () {
+        Route::apiResource("admin/catalogue", CatalogueController::class);
+        Route::apiResource("admin/user", UserController::class);
+        Route::apiResource("admin/producCapacity", ProductCapacity::class);
+        Route::apiResource("admin/productColor", ProductColor::class);
+        Route::apiResource("admin/banner", BannerController::class);
+
+        // Comment
+        Route::get('/admin/comments', [CommentController::class, 'index']); 
+        Route::put('/admin/comments/approve/{id}', [CommentController::class, 'approve']); 
+        Route::delete('/admin/comments/{id}', [CommentController::class, 'destroy']); 
+    });
 
 
 // Client
