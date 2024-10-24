@@ -35,12 +35,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         ->name('password.reset');
 
 // Admin
-    Route::apiResource("admin/catalogue", CatalogueController::class);
-    Route::apiResource("admin/user", UserController::class);
-    Route::apiResource("admin/producCapacity", ProductCapacity::class);
-    Route::apiResource("admin/productColor", ProductColor::class);
-    Route::apiResource("admin/banner", BannerController::class);
-    
+    Route::middleware(['auth:sanctum', 'checkAdmin'])->group(function () {
+        Route::apiResource("admin/catalogue", CatalogueController::class);
+        Route::apiResource("admin/user", UserController::class);
+        Route::apiResource("admin/producCapacity", ProductCapacity::class);
+        Route::apiResource("admin/productColor", ProductColor::class);
+        Route::apiResource("admin/banner", BannerController::class);
+    });
 
 
 // Client
