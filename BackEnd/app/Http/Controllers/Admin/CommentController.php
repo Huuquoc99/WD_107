@@ -27,4 +27,12 @@ class CommentController extends Controller
 
         return response()->json(['message' => 'Comment has been approved successfully.'], 200);
     }
+
+    public function destroy($id)
+    {
+        $comment = Comment::findOrFail($id);
+        $comment->delete();
+
+        return response()->json(['message' => 'Comment deleted successfully.'], 200);
+    }
 }
