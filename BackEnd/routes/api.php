@@ -40,10 +40,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::apiResource("admin/producCapacity", ProductCapacity::class);
     Route::apiResource("admin/productColor", ProductColor::class);
     Route::apiResource("admin/banner", BannerController::class);
-    
+    Route::apiResource('admin/products', ProductController::class);
 
 
 // Client
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}/password', [ClientUserController::class, 'updatePassword']);
+    Route::get('/product/{slug}',[\App\Http\Controllers\Client\ProductController::class, 'productDetail'])->name('product.detail');
