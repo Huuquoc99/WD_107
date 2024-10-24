@@ -59,9 +59,28 @@ class AuthController extends Controller
             }
             $token = $user->createToken($user->id)->plainTextToken;
     
-            return response()->json([
-                "token" => $token
-            ]);
+            // return response()->json([
+            //     "token" => $token
+            // ]);
+
+            // Phân quyền người dùng
+            if ($user->type == 1) {
+                // Nếu là admin
+                return response()->json([
+                    "token" => $token,
+                    "role" => "admin",
+                    "redirect" => "/admin/dashboard"
+                ], Response::HTTP_OK);
+            } else {
+                // Nếu là user thông thường
+                return response()->json([
+                    "token" => $token,
+                    "role" => "client",
+                    "redirect" => "/client/home" 
+                ], Response::HTTP_OK);
+            }
+            //
+
         } catch (\Throwable $th) {
             if($th instanceof ValidationException){
                 return response()->json([
