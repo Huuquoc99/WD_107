@@ -36,7 +36,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         ->name('password.reset');
 
 // Admin
-    Route::middleware(['auth:sanctum', 'checkAdmin'])->group(function () {
+    Route::middleware(['auth:sanctum', 'checkAdminMiddleware'])->group(function () {
         Route::apiResource("admin/catalogue", CatalogueController::class);
         Route::apiResource("admin/user", UserController::class);
         Route::apiResource("admin/producCapacity", ProductCapacity::class);
