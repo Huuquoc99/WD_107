@@ -60,5 +60,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/product/{slug}',[\App\Http\Controllers\Client\ProductController::class, 'productDetail'])->name('product.detail');
 
     // Comment
-    Route::post('/products/{product_id}/comments', [ClientCommentController::class, 'store']);
+    Route::resource('products.comments', CommentController::class);
         
