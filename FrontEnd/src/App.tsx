@@ -3,16 +3,19 @@ import { useState } from "react";
 import "./App.css";
 
 import { Route, Routes } from "react-router-dom";
-import Register from "./Components/Register/Register";
-import Login from "./Components/Login/Login";
-import PrivateRouter from "./Components/PrivateRoute";
-import Dashboard from "./Admin/Dashboard";
+import RegisterForm from "./component/RegisterForm";
+import LoginForm from "./component/LoginForm";
+import Dashboard from "./component/Dashboard";
+
 
 
 function App() {
   return (
     <>
-     
+        <Routes>
+        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
     </>
   );
 }
