@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Client;
 
-use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class CommentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($product_id)
     {
-        //
+        $comments = Comment::where('product_id', $product_id)->where('is_active', true)->get();
+        return response()->json($comments);
     }
 
     /**
