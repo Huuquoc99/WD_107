@@ -12,7 +12,7 @@ import Dashboard from "./Admin/Dashboard";
 function App() {
   return (
     <>
-     
+      <h1>Welcome</h1>
     </>
   );
 }
