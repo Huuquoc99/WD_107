@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class StatusOrder extends Model
 {
     use HasFactory;
+
+    
 }
