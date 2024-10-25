@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Client\ClientUserController;
+use App\Http\Controllers\Client\CommentController as ClientCommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,4 +55,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}/password', [ClientUserController::class, 'updatePassword']);
+
+    // Detail product
     Route::get('/product/{slug}',[\App\Http\Controllers\Client\ProductController::class, 'productDetail'])->name('product.detail');
+
+
+    
