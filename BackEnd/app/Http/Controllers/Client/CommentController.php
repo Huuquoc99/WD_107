@@ -63,7 +63,7 @@ class CommentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $product_id, $comment_id)
+    public function update(CommentRequest $request, $product_id, $comment_id)
     {
         $comment = Comment::findOrFail($comment_id);
         $comment->update($request->only('content'));
@@ -73,10 +73,5 @@ class CommentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($product_id, $comment_id)
-    {
-        $comment = Comment::findOrFail($comment_id);
-        $comment->delete();
-        return response()->json(['message' => 'Bình luận đã được xóa!']);
-    }
+    
 }
