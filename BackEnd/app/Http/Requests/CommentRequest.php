@@ -11,7 +11,7 @@ class CommentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,22 @@ class CommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
+            'content' => 'required|string',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'user_id.required' => 'User ID is required.',
+            'user_id.exists' => 'User ID does not exist.',
+            'product_id.required' => 'Product ID is required.',
+            'product_id.exists' => 'Product ID does not exist.',
+            'content.required' => 'Comment content is required.',
+            'content.string' => 'Comment content must be a string.',
+        ];
+    }
+
 }
