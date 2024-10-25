@@ -44,14 +44,17 @@ class CommentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($product_id, $comment_id)
     {
-        //
+        // http://localhost:8000/api/products/4/comments/8
+        $comment = Comment::where('product_id', $product_id)->where('id', $comment_id)->firstOrFail();
+        return response()->json($comment);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
+    // Chưa commit
     public function edit(string $id)
     {
         //
@@ -60,16 +63,20 @@ class CommentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $product_id, $comment_id)
     {
-        //
+        $comment = Comment::findOrFail($comment_id);
+        $comment->update($request->only('content'));
+        return response()->json(['message' => 'Bình luận đã được cập nhật!', 'comment' => $comment]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($product_id, $comment_id)
     {
-        //
+        $comment = Comment::findOrFail($comment_id);
+        $comment->delete();
+        return response()->json(['message' => 'Bình luận đã được xóa!']);
     }
 }
