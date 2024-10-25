@@ -65,13 +65,19 @@ class CommentController extends Controller
      */
     public function update(CommentRequest $request, $product_id, $comment_id)
     {
+        // http://localhost:8000/api/products/4/comments/8
         $comment = Comment::findOrFail($comment_id);
         $comment->update($request->only('content'));
-        return response()->json(['message' => 'Bình luận đã được cập nhật!', 'comment' => $comment]);
+        return response()->json(['message' => 'Comments have been updated!', 'comment' => $comment]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    
+    public function destroy($product_id, $comment_id)
+    {
+        $comment = Comment::findOrFail($comment_id);
+        $comment->delete();
+        return response()->json(['message' => 'Bình luận đã được xóa!']);
+    }
 }
