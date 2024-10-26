@@ -60,7 +60,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Client
     // List product
-    Route::get("/shop", [ShopController::class, "listProduct"])->name("products.shop");
+    Route::get("/shop", [ShopController::class, "listProduct"])->name("product.shop");
+
+    // Filter by category
+    Route::get('/shop/category/{id}', [ShopController::class, 'listProductsByCategory'])->name('shop.category');
 
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
