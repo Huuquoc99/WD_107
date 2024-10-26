@@ -53,6 +53,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         // Trash
         Route::get('/admin/trashed', [TrashedController::class, 'trashed']);
         Route::post('/admin/restore/{id}', [TrashedController::class, 'restore']);
+        // Route::delete('/admin/force-delete/{id}', [TrashedController::class, 'forceDelete']);
     });
 
 
