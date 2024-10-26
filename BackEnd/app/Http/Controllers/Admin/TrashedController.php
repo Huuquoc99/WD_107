@@ -13,4 +13,12 @@ class TrashedController extends Controller
         $trashed = Product::onlyTrashed()->get();
         return response()->json($trashed);
     }
+
+    public function restore($id)
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+        $product->restore();
+
+        return response()->json(['message' => 'Product restore successful']);
+    }
 }
