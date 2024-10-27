@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Client\CartControler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
@@ -45,6 +47,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Client
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
-    Route::put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
-    Route::put('/user/{id}/password', [ClientUserController::class, 'updatePassword']);
-    Route::get('/product/{slug}',[\App\Http\Controllers\Client\ProductController::class, 'productDetail'])->name('product.detail');
+    Route::put('/user/{id}',            [ClientUserController::class, 'updateUserInfo']);
+    Route::put('/user/{id}/password',   [ClientUserController::class, 'updatePassword']);
+    Route::get('/product/{slug}',       [ProductController::class, 'productDetail'])->name('product.detail');
+    Route::post('/product/add-to-cart', [CartControler::class, 'addToCart']);
