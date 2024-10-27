@@ -1,20 +1,23 @@
-import { useState } from "react";
-
-import "./App.css";
 
 import { Route, Routes } from "react-router-dom";
-import RegisterForm from "./component/RegisterForm";
-import LoginForm from "./component/LoginForm";
-import Dashboard from "./component/Dashboard";
+import "./App.css";
+import Register from "./Register";
+import Login from "./Login";
+import ForgotPassword from "./ForgotPassword";
+import ResetPassword from "./ResetPassword";
+
+
 
 
 
 function App() {
   return (
     <>
-        <Routes>
-        <Route path="/register" element={<RegisterForm />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+      <Routes>
+        <Route path="/" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </>
   );

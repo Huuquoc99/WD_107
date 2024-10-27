@@ -1,8 +1,7 @@
-export interface Users {
-	email: string
-	password: string
-	confirmPass: string
-	username?: string
-	address?: string
-	id?: string | number
+export interface User{
+    id?:string| number
+    name: string
+    email: string
+    password: string
+    password_confirmation: string
 }

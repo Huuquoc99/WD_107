@@ -1,34 +1,13 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Cross-Origin Resource Sharing (CORS) Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure your settings for cross-origin resource sharing
-    | or "CORS". This determines what cross-origin operations may execute
-    | in web browsers. You are free to adjust these settings as needed.
-    |
-    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-    |
-    */
-
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
-
-    'allowed_methods' => ['*'],
-
-    'allowed_origins' => ['*'],
-
+    'paths' => ['api/*'], // Đường dẫn API nào sẽ được áp dụng CORS, có thể là ['*'] để áp dụng tất cả
+    'allowed_methods' => ['*'], // Các phương thức HTTP được phép (GET, POST, v.v.). Dùng ['*'] để cho phép tất cả
+    'allowed_origins' => ['http://localhost:5173', 'http://localhost:3000'], // Thêm các origin cần cho phép
     'allowed_origins_patterns' => [],
-
-    'allowed_headers' => ['*'],
-
+    'allowed_headers' => ['*'], // Các headers được phép, dùng ['*'] để cho phép tất cả
     'exposed_headers' => [],
-
     'max_age' => 0,
-
     'supports_credentials' => false,
-
 ];
+
