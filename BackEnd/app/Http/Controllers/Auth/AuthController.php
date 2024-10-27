@@ -146,67 +146,147 @@ class AuthController extends Controller
         }
     }
 
-    // Quên mật khẩu
-    public function forgotPassword(Request $request)
-    {
-        try {
-            $request->validate([
-                'email' => 'required|email',
-            ]);
-    
-            // Gửi đường link thay đổi mật khẩu qua email
-            $status = Password::sendResetLink(
-                $request->only('email')
-            );
-    
-            if ($status === Password::RESET_LINK_SENT) {
-                return response()->json(['message' => __($status)]);
-            }
-    
-            throw ValidationException::withMessages([
-                'email' => [trans($status)],
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                "errors" => $th->getMessage()
-            ], 500);
-        }
+    public function verifyCode(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'code' => 'required|string',
+    ]);
+
+    $resetRecord = DB::table('password_resets')
+        ->where('email', $request->email)
+        ->where('verification_code', $request->code)
+        ->first();
+
+    if (!$resetRecord) {
+        return response()->json(['message' => 'Invalid verification code'], 400);
     }
 
-    public function resetPassword(Request $request)
-    {
-        try {
-            $request->validate([
-                'email' => 'required|email',
-                'token' => 'required',
-                'password' => 'required|min:8|confirmed',
-            ]);
+    return response()->json(['message' => 'Code verified successfully']);
+}
+
+
+    // Quên mật khẩu
+    // public function forgotPassword(Request $request)
+    // {
+    //     try {
+    //         $request->validate([
+    //             'email' => 'required|email',
+    //         ]);
     
-            // Đặt lại mật khẩu
-            $status = Password::reset(
-                $request->only('email', 'password', 'password_confirmation', 'token'),
-                function ($user, $password) {
-                    $user->forceFill([
-                        'password' => Hash::make($password)
-                    ])->save();
-                }
-            );
+    //         // Gửi đường link thay đổi mật khẩu qua email
+    //         $status = Password::sendResetLink(
+    //             $request->only('email')
+    //         );
     
-            if ($status == Password::PASSWORD_RESET) {
-                return response()->json(['message' => __($status)]);
-            }
+    //         if ($status === Password::RESET_LINK_SENT) {
+    //             return response()->json(['message' => __($status)]);
+    //         }
     
-            throw ValidationException::withMessages([
-                'email' => [trans($status)],
-            ]);
-        } catch (\Throwable $th) {
-            return response()->json([
-                "errors" => $th->getMessage()
-            ], 500);
-        };
+    //         throw ValidationException::withMessages([
+    //             'email' => [trans($status)],
+    //         ]);
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             "errors" => $th->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+    // public function resetPassword(Request $request)
+    // {
+    //     try {
+    //         $request->validate([
+    //             'email' => 'required|email',
+    //             'token' => 'required',
+    //             'password' => 'required|min:8|confirmed',
+    //         ]);
+    
+    //         // Đặt lại mật khẩu
+    //         $status = Password::reset(
+    //             $request->only('email', 'password', 'password_confirmation', 'token'),
+    //             function ($user, $password) {
+    //                 $user->forceFill([
+    //                     'password' => Hash::make($password)
+    //                 ])->save();
+    //             }
+    //         );
+    
+    //         if ($status == Password::PASSWORD_RESET) {
+    //             return response()->json(['message' => __($status)]);
+    //         }
+    
+    //         throw ValidationException::withMessages([
+    //             'email' => [trans($status)],
+    //         ]);
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             "errors" => $th->getMessage()
+    //         ], 500);
+    //     };
 
         
+    // }
+
+    // Phương thức gửi link đặt lại mật khẩu
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+    
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Email not found'], 404);
+        }
+    
+       
+        $verificationCode = Str::random(6); // Ví dụ: 6 ký tự
+        DB::table('password_resets')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'verification_code' => $verificationCode,
+                'created_at' => now(),
+            ]
+        );
+    
+        // Gửi mã xác minh qua email
+        Mail::to($request->email)->send(new VerificationCodeMail($verificationCode));
+    
+        return response()->json(['message' => 'Verification code sent to your email']);
     }
+
+    // Phương thức đặt lại mật khẩu
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+            'code' => 'required|string'
+        ]);
+    
+        $resetRecord = DB::table('password_resets')
+            ->where('email', $request->email)
+            ->where('verification_code', $request->code)
+            ->first();
+    
+        if (!$resetRecord) {
+            return response()->json(['message' => 'Invalid verification code'], 400);
+        }
+    
+        // Đặt lại mật khẩu
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $user->password = bcrypt($request->password);
+            $user->save();
+    
+            // Xóa bản ghi mã xác minh sau khi đặt lại mật khẩu thành công
+            DB::table('password_resets')->where('email', $request->email)->delete();
+    
+            return response()->json(['message' => 'Password reset successfully']);
+        }
+    
+        return response()->json(['message' => 'User not found'], 404);
+    }
+    
 
     public function showResetForm(Request $request, $token = null)
     {

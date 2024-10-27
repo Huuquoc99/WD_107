@@ -1,57 +1,66 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { z } from "zod";
-import { instance } from "./api";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { instance } from "./api";
 
 const EmailSchema = z.object({
-    email: z.string().email("Invalid email address"),
+    email: z.string().email(),
+});
+
+const CodeSchema = z.object({
+    code: z.string().min(1),
 });
 
 const ResetPasswordSchema = z.object({
-    token: z.string(),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters").max(20, "Password must be at most 20 characters"),
-    confirmPassword: z.string().min(1, "Please confirm your password")
-}).refine(data => data.password === data.confirmPassword, {
+    password: z.string().min(8).max(20),
+    password_confirmation: z.string().min(8).max(20),
+}).refine(data => data.password === data.password_confirmation, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
+    path: ["password_confirmation"],
 });
 
 const ForgotPassword = () => {
     const nav = useNavigate();
-    const [step, setStep] = useState(1);
-    const [token, setToken] = useState('');
+    const [step, setStep] = useState(1); // Bước hiện tại
+    const [email, setEmail] = useState(""); // Lưu email đã nhập
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(step === 1 ? EmailSchema : ResetPasswordSchema),
+        resolver: zodResolver(step === 1 ? EmailSchema : step === 2 ? CodeSchema : ResetPasswordSchema),
     });
 
     const onSubmit = async (data) => {
         if (step === 1) {
-            // Gửi email
             try {
-                const response = await instance.post('/forgot-password', data);
-                alert(response.data.status); // Hiển thị thông báo thành công
-                setStep(2); // Chuyển sang bước nhập mã xác nhận
-                setToken(response.data.token); // Lưu token
+                const response = await instance.post('/forgot-password', { email: data.email }); 
+                alert(response.data.message || "Verification code sent to your email."); 
+                setStep(2); // Chuyển sang bước 2 để nhập mã xác minh
+                setEmail(data.email); // Lưu email để sử dụng trong bước 3
             } catch (error) {
-                console.error('Error sending reset link:', error);
-                // Xử lý lỗi
+                console.error('Error sending verification code:', error);
+                alert("Failed to send verification code. Please try again.");
+            }
+        } else if (step === 2) {
+            try {
+                const response = await instance.post('/verify-code', { email, code: data.code }); 
+                alert(response.data.message || "Code verified! You can now reset your password."); 
+                setStep(3); // Chuyển sang bước 3 để đặt lại mật khẩu
+            } catch (error) {
+                console.error('Error verifying code:', error);
+                alert("Invalid verification code. Please try again.");
             }
         } else {
-            // Đặt lại mật khẩu
             try {
-                const response = await instance.post('/reset-password', { ...data, token });
-                alert(response.data.status); // Hiển thị thông báo thành công
-                nav("/login"); // Chuyển hướng về trang login sau khi gửi thành công
+                const response = await instance.post('/reset-password', { email, password: data.password });
+                alert(response.data.message || "Password reset successfully!"); 
+                nav("/login"); // Chuyển hướng về trang login sau khi reset thành công
             } catch (error) {
                 console.error('Error resetting password:', error);
-                // Xử lý lỗi
+                alert("Failed to reset password. Please try again.");
             }
         }
     };
@@ -59,7 +68,7 @@ const ForgotPassword = () => {
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)}>
-                {step === 1 ? (
+                {step === 1 && (
                     <>
                         <div className="form-group">
                             <label htmlFor="email" className="form-label">Email</label>
@@ -70,20 +79,25 @@ const ForgotPassword = () => {
                             />
                             {errors.email && <span className="text-danger">{errors.email.message}</span>}
                         </div>
-                        <button className="btn btn-outline-secondary">Send Reset Link</button>
+                        <button className="btn btn-outline-secondary" type="submit">Send Verification Code</button>
                     </>
-                ) : (
+                )}
+                {step === 2 && (
                     <>
                         <div className="form-group">
-                            <label htmlFor="token" className="form-label">Verification Token</label>
+                            <label htmlFor="code" className="form-label">Verification Code</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                {...register("token")}
-                                defaultValue={token} // Đặt token
+                                {...register("code")}
                             />
-                            {errors.token && <span className="text-danger">{errors.token.message}</span>}
+                            {errors.code && <span className="text-danger">{errors.code.message}</span>}
                         </div>
+                        <button className="btn btn-outline-secondary" type="submit">Verify Code</button>
+                    </>
+                )}
+                {step === 3 && (
+                    <>
                         <div className="form-group">
                             <label htmlFor="password" className="form-label">New Password</label>
                             <input
@@ -94,15 +108,15 @@ const ForgotPassword = () => {
                             {errors.password && <span className="text-danger">{errors.password.message}</span>}
                         </div>
                         <div className="form-group">
-                            <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                            <label htmlFor="password_confirmation" className="form-label">Confirm Password</label>
                             <input
                                 type="password"
                                 className="form-control"
-                                {...register("confirmPassword")}
+                                {...register("password_confirmation")}
                             />
-                            {errors.confirmPassword && <span className="text-danger">{errors.confirmPassword.message}</span>}
+                            {errors.password_confirmation && <span className="text-danger">{errors.password_confirmation.message}</span>}
                         </div>
-                        <button className="btn btn-outline-secondary">Reset Password</button>
+                        <button className="btn btn-outline-secondary" type="submit">Reset Password</button>
                     </>
                 )}
             </form>

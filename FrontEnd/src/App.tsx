@@ -4,7 +4,8 @@ import "./App.css";
 import Register from "./Register";
 import Login from "./Login";
 import ForgotPassword from "./ForgotPassword";
-import ResetPassword from "./ResetPassword";
+import Home from "./Home";
+import Dashboard from "./Dashboard";
 
 
 
@@ -14,10 +15,12 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Register />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<Dashboard />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        
       </Routes>
     </>
   );
