@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AddToCartRequest;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class CartControler extends Controller
 {
-    public function addToCart(Request $request)
+    public function addToCart(AddToCartRequest $request)
     {
         try {
             DB::beginTransaction();
