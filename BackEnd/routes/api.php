@@ -1,7 +1,9 @@
 <?php
 
+<<<<<<<<< Temporary merge branch 1
 use App\Http\Controllers\Client\HomeController;
 use App\Models\ProductColor;
+=========
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Client\CartControler;
 use Illuminate\Http\Request;
@@ -17,6 +19,8 @@ use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Admin\StatusOrderController;
 use App\Http\Controllers\Client\ClientUserController;
 use App\Http\Controllers\Client\CommentController as ClientCommentController;
+use App\Http\Controllers\Client\HomeController;
+use App\Models\ProductColor;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +79,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/shop/category/{id}', [ShopController::class, 'listProductsByCategory'])->name('shop.category');
 
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
+<<<<<<<<< Temporary merge branch 1
     Route::put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}/password', [ClientUserController::class, 'updatePassword']);
 
@@ -84,7 +89,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // Comment
     Route::resource('products/{product_id}/comments', ClientCommentController::class);
         
+=========
     Route::put('/user/{id}',            [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}/password',   [ClientUserController::class, 'updatePassword']);
     Route::get('/product/{slug}',       [ProductController::class, 'productDetail'])->name('product.detail');
     Route::post('/product/add-to-cart', [CartControler::class, 'addToCart']);
+>>>>>>>>> Temporary merge branch 2
