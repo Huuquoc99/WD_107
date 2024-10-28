@@ -45,7 +45,8 @@ class StatusOrderController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $statusOrder = StatusOrder::query()->findOrFail($id);
+        return response()->json($statusOrder);
     }
 
     /**
