@@ -15,6 +15,101 @@ use Illuminate\Support\Facades\DB;
 
 class CartControler extends Controller
 {
+    public function list()
+    {
+        $totalAmount = 0;
+        $unifiedCart = [];
+        $sessionCart = session()->get('cart', []);
+
+        if (Auth::check()) {
+            $dbCart = Cart::with(['items.productVariant.product'])
+                ->where('user_id', Auth::id())
+                ->first();
+
+            if ($dbCart) {
+                foreach ($dbCart->items as $item) {
+                    $product = $item->productVariant->product;
+                    $productVariant = $item->productVariant;
+
+                    $unifiedCart[$productVariant->id] = [
+                        'product_variant_id' => $productVariant->id,
+                        'product_id' => $product->id,
+                        'name' => $product->name,
+                        'price' => $product->price_sale ?? $product->price,
+                        'quantity' => $item->quantity,
+                        'color' => $productVariant->color->name,
+                        'size' => $productVariant->capacity->name,
+                        'image' => $productVariant->image
+                    ];
+
+                    $totalAmount += $item->quantity * ($product->price_sale ?? $product->price);
+                }
+                // Thêm giỏ hàng session và db
+                if (!empty($sessionCart)) {
+                    foreach ($sessionCart as $item) {
+                        $cartItem = CartItem::query()->where([
+                            'cart_id' => $dbCart->id,
+                            'product_variant_id' => $item['product_variant_id']
+                        ])->first();
+
+                        if ($cartItem) {
+                            $cartItem->quantity += $item['quantity'];
+                            $cartItem->save();
+                            // Cập nhật số lượng
+                            if (isset($unifiedCart[$item['product_variant_id']])) {
+                                $unifiedCart[$item['product_variant_id']]['quantity'] += $item['quantity'];
+                            }
+                        } else {
+                            CartItem::query()->create([
+                                'cart_id' => $dbCart->id,
+                                'product_variant_id' => $item['product_variant_id'],
+                                'quantity' => $item['quantity'],
+                                'price' => $item['price']
+                            ]);
+
+                            $unifiedCart[$item['product_variant_id']] = $item;
+                        }
+                        $totalAmount += $item['quantity'] * $item['price'];
+                    }
+                    // Xóa session sau khi đã lưu vào db
+                    session()->forget('cart');
+                }
+            } else {
+                // Tạo mới giỏ hàng trong db nếu giỏ hàng db trống
+                if (!empty($sessionCart)) {
+                    $dbCart = Cart::query()->create([
+                        'user_id' => Auth::id()
+                    ]);
+
+                    foreach ($sessionCart as $item) {
+                        CartItem::query()->create([
+                            'cart_id' => $dbCart->id,
+                            'product_variant_id' => $item['product_variant_id'],
+                            'quantity' => $item['quantity'],
+                            'price' => $item['price']
+                        ]);
+
+                        $unifiedCart[$item['product_variant_id']] = $item;
+                        $totalAmount += $item['quantity'] * $item['price'];
+                    }
+
+                    session()->forget('cart');
+                }
+            }
+        } else {
+            $unifiedCart = $sessionCart;
+            foreach ($sessionCart as $item) {
+                $totalAmount += $item['quantity'] * $item['price'];
+            }
+        }
+
+        return response()->json([
+            'unifiedCart' => $unifiedCart,
+            'totalAmount' => $totalAmount,
+        ], 200);
+    }
+
+
     public function addToCart(AddToCartRequest $request)
     {
         try {
