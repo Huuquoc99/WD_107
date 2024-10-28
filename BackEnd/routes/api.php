@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Client\HomeController;
 use App\Models\ProductColor;
 use Illuminate\Http\Request;
 use App\Models\ProductCapacity;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\TrashedController;
+use App\Http\Controllers\Client\ProductController;
 use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Client\ClientUserController;
 use App\Http\Controllers\Client\CommentController as ClientCommentController;
@@ -59,6 +61,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 // Client
+    // Home
+    Route::get("/home", [HomeController::class, "index"])->name("index");
+    
     // List product
     Route::get("/shop", [ShopController::class, "listProduct"])->name("product.shop");
 
