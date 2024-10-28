@@ -1,22 +1,23 @@
 <?php
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Client\CartControler;
+use App\Models\ProductColor;
 use Illuminate\Http\Request;
 use App\Models\ProductCapacity;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Client\CartControler;
+use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TrashedController;
 use App\Http\Controllers\Admin\CatalogueController;
+use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Admin\StatusOrderController;
-use App\Http\Controllers\Admin\StatusPaymentController;
 use App\Http\Controllers\Client\ClientUserController;
+use App\Http\Controllers\Admin\StatusPaymentController;
 use App\Http\Controllers\Client\CommentController as ClientCommentController;
-use App\Http\Controllers\Client\HomeController;
-use App\Models\ProductColor;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,3 +89,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
     // Cart
     Route::post('/product/add-to-cart', [CartControler::class, 'addToCart']);
+
+    // Checkout
+    Route::post('/checkout', [CheckoutController::class, 'checkout']);
