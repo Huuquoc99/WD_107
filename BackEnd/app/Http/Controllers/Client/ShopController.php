@@ -40,7 +40,7 @@ class ShopController extends Controller
 
     return response()->json([
         'data' => $product,
-        'message' => 'Danh sách sản phẩm theo danh mục thành công.',
+        'message' => 'List of products by category successfully.',
     ]);
 }
 
