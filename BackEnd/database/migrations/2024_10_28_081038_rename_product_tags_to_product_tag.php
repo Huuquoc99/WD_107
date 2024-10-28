@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('product_tag', function (Blueprint $table) {
-            //
-        });
+        Schema::rename('product_tags', 'product_tag');
     }
 
     /**
@@ -21,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('product_tag', function (Blueprint $table) {
-            //
-        });
+        Schema::rename('product_tag', 'product_tags');
     }
 };
