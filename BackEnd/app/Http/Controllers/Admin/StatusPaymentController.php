@@ -84,6 +84,8 @@ class StatusPaymentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $statusPayment = StatusPayment::findOrFail($id);
+        $statusPayment->delete();
+        return response()->json(['message' => 'Status payment deleted successfully']);
     }
 }
