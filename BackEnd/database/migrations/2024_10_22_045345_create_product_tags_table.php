@@ -18,7 +18,6 @@ return new class extends Migration
             $table->foreignIdFor(model: Product::class)->constrained();
             $table->foreignIdFor(model: Tag::class)->constrained();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
