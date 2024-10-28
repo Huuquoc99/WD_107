@@ -45,7 +45,8 @@ class StatusPaymentController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $statusPayment = StatusPayment::query()->findOrFail($id);
+        return response()->json($statusPayment);
     }
 
     /**
