@@ -54,7 +54,8 @@ class StatusPaymentController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $statusPayment = StatusPayment::findOrFail($id);
+        return response()->json($statusPayment);
     }
 
     /**
