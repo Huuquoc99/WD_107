@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StatusPaymentRequest;
 use App\Models\StatusPayment;
 use Illuminate\Http\Request;
 
@@ -28,9 +29,15 @@ class StatusPaymentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StatusPaymentRequest $request)
     {
-        //
+        if ($request->isMethod("POST")) {
+            $param = $request->except("_token",);
+        
+            StatusPayment::create($param);
+        
+            return response()->json(['message' => 'Status payment created successfully']);
+        }
     }
 
     /**
