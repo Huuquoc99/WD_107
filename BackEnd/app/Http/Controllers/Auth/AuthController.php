@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Password;
 
-class AuthController extends Controller
+class  AuthController extends Controller
 {
     // Đăng kí
     public function register()
@@ -39,7 +39,7 @@ class AuthController extends Controller
                 "errors" => $th->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    } 
+    }
 
     // Đăng nhập
     // public function login()
@@ -101,7 +101,7 @@ class AuthController extends Controller
                 "email" => "required|email",
                 "password" => "required",
             ]);
-    
+
             $user = User::where("email", request("email"))->first();
     
             if ($user && Hash::check(request("password"), $user->password)) {
@@ -153,16 +153,16 @@ class AuthController extends Controller
             $request->validate([
                 'email' => 'required|email',
             ]);
-    
+
             // Gửi đường link thay đổi mật khẩu qua email
             $status = Password::sendResetLink(
                 $request->only('email')
             );
-    
+
             if ($status === Password::RESET_LINK_SENT) {
                 return response()->json(['message' => __($status)]);
             }
-    
+
             throw ValidationException::withMessages([
                 'email' => [trans($status)],
             ]);
@@ -181,7 +181,7 @@ class AuthController extends Controller
                 'token' => 'required',
                 'password' => 'required|min:8|confirmed',
             ]);
-    
+
             // Đặt lại mật khẩu
             $status = Password::reset(
                 $request->only('email', 'password', 'password_confirmation', 'token'),
@@ -191,11 +191,11 @@ class AuthController extends Controller
                     ])->save();
                 }
             );
-    
+
             if ($status == Password::PASSWORD_RESET) {
                 return response()->json(['message' => __($status)]);
             }
-    
+
             throw ValidationException::withMessages([
                 'email' => [trans($status)],
             ]);
@@ -205,7 +205,7 @@ class AuthController extends Controller
             ], 500);
         };
 
-        
+
     }
 
     public function showResetForm(Request $request, $token = null)

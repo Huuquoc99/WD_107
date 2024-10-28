@@ -26,13 +26,9 @@ return new class extends Migration
             $table->tinyInteger("status")->default(1);
             $table->timestamps();
             $table->unique(['product_id', 'product_capacity_id', 'product_color_id'], 'product_variant_unique');
-            $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('product_variants');
