@@ -61,9 +61,22 @@ class StatusPaymentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StatusPaymentRequest $request, string $id)
     {
-        //
+        if ($request->isMethod("PUT")) {
+            $param = $request->except("_token", "_method");
+            $statusPayment = StatusPayment::findOrFail($id);
+        
+            $statusPayment->update($param);
+        
+            if ($statusPayment->is_active == 0) {
+                $statusPayment->hide();
+            } else {
+                $statusPayment->show();
+            }
+        
+            return response()->json(['message' => 'Status payment updated successfully']);
+        }
     }
 
     /**
