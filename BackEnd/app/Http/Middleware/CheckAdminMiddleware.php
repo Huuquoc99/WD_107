@@ -15,10 +15,16 @@ class CheckAdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()->is_active !== 1) { // 1 là admin
+        // Kiểm tra xem người dùng đã đăng nhập hay chưa
+        if (!$request->user()) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Kiểm tra xem người dùng có phải admin hay không
+        if ($request->user()->type !== 1) { // 1 là admin
             return response()->json(['message' => 'Forbidden'], 403);
         }
-        
+
         return $next($request);
     }
 }
