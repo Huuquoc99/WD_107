@@ -150,7 +150,7 @@ class AuthController extends Controller
 {
     $request->validate([
         'email' => 'required|email',
-        'code' => 'required|string',
+        'code' => 'required|string|min:1',
     ]);
 
     $resetRecord = DB::table('password_resets')
@@ -255,12 +255,14 @@ class AuthController extends Controller
     }
 
     // Phương thức đặt lại mật khẩu
+   
+
     public function resetPassword(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
-            'code' => 'required|string'
+            'password' => 'required|string|min:8|max:20|confirmed',
+            'code' => 'required|string|min:1',
         ]);
     
         $resetRecord = DB::table('password_resets')
@@ -275,7 +277,7 @@ class AuthController extends Controller
         // Đặt lại mật khẩu
         $user = User::where('email', $request->email)->first();
         if ($user) {
-            $user->password = bcrypt($request->password);
+            $user->password = Hash::make($request->password); // Mã hóa mật khẩu
             $user->save();
     
             // Xóa bản ghi mã xác minh sau khi đặt lại mật khẩu thành công
@@ -286,6 +288,7 @@ class AuthController extends Controller
     
         return response()->json(['message' => 'User not found'], 404);
     }
+    
     
 
     public function showResetForm(Request $request, $token = null)
