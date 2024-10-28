@@ -85,6 +85,8 @@ class StatusOrderController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $statusOrder = StatusOrder::findOrFail($id);
+        $statusOrder->delete();
+        return response()->json(['message' => 'Status order deleted successfully']);
     }
 }
