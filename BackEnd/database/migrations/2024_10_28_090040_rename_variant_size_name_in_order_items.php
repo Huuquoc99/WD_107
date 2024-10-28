@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('order_items', function (Blueprint $table) {
-            //
-        });
+        // Schema::table('order_items', function (Blueprint $table) {
+        //     $table->renameColumn('variant_size_name', 'variant_capacity_name');
+        // });
+        
     }
 
     /**
@@ -21,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('order_items', function (Blueprint $table) {
-            //
-        });
+        // Schema::table('order_items', function (Blueprint $table) {
+        //     $table->renameColumn('variant_capacity_name', 'variant_size_name');
+        // });
+        
     }
 };
