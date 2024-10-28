@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\TrashedController;
 use App\Http\Controllers\Admin\CatalogueController;
 use App\Http\Controllers\Admin\StatusOrderController;
+use App\Http\Controllers\Admin\StatusPaymentController;
 use App\Http\Controllers\Client\ClientUserController;
 use App\Http\Controllers\Client\CommentController as ClientCommentController;
 use App\Http\Controllers\Client\HomeController;
@@ -49,6 +50,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         Route::apiResource("admin/productColor", ProductColor::class);
         Route::apiResource("admin/banner", BannerController::class);
         Route::apiResource("admin/statusOrder", StatusOrderController::class);
+        Route::apiResource("admin/statusPayment", StatusPaymentController::class);
+        Route::apiResource('admin/products', ProductController::class);
 
 
         // Comment
