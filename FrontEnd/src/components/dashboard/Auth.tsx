@@ -10,7 +10,16 @@ const Auth = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await instance.get('admin/user');
+                // Lấy token từ localStorage (hoặc nơi bạn lưu trữ)
+                const token = localStorage.getItem('token'); 
+
+                // Gửi yêu cầu với token trong header
+                const response = await instance.get('admin/user', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Gửi token vào header
+                    },
+                });
+
                 setUsers(response.data);
             } catch (err) {
                 setError('Không thể tải danh sách người dùng');
@@ -22,12 +31,17 @@ const Auth = () => {
         fetchUsers();
     }, []);
 
-    const handleRoleChange = async (userId: number, newRole: number) => {
+    const handleRoleChange = async (userId: number, newType: number) => {
         try {
-            await instance.put(`/users/${userId}`, { role: newRole });
+            const token = localStorage.getItem('token'); // Lấy token để cập nhật quyền
+            await instance.put(`/users/${userId}`, { type: newType }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Gửi token vào header
+                },
+            });
             setUsers(prevUsers =>
                 prevUsers.map(user =>
-                    user.id === userId ? { ...user, role: newRole } : user
+                    user.id === userId ? { ...user, type: newType } : user
                 )
             );
         } catch (err) {
@@ -65,7 +79,7 @@ const Auth = () => {
                             <td>{user.type === 1 ? 'Admin' : 'Người Dùng'}</td>
                             <td>
                                 <button
-                                    onClick={() => handleRoleChange(user.id , user.type === 1 ? 0 : 1)}
+                                    onClick={() => handleRoleChange(user.id, user.type === 1 ? 0 : 1)}
                                 >
                                     Chuyển thành {user.type === 1 ? 'Người Dùng' : 'Admin'}
                                 </button>

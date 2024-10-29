@@ -41,9 +41,10 @@ const Dashboard = () => (
       }}
     >
       <div className="logo">
-        <Title level={3} style={{ color: "white", margin: 0 }}>
+       <Link to="/admin">
+       <Title level={3} style={{ color: "white", margin: 0 }}>
           Dashboard
-        </Title>
+        </Title></Link>
       </div>
       <Space>
         <Dropdown overlay={menu} trigger={["click"]}>

@@ -46,7 +46,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Admin
     Route::middleware(['auth:sanctum', 'checkAdminMiddleware'])->group(function () {
         Route::apiResource("admin/catalogue", CatalogueController::class);
-        Route::apiResource("admin/user", UserController::class);
+        // Route::apiResource("admin/user", UserController::class);
+        Route::middleware('auth:api')->group(function () {
+            Route::get('/admin/user', [UserController::class, 'index']);
+        });
+        
         Route::apiResource("admin/producCapacity", ProductCapacity::class);
         Route::apiResource("admin/productColor", ProductColor::class);
         Route::apiResource("admin/banner", BannerController::class);
