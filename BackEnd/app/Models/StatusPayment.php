@@ -22,4 +22,9 @@ class StatusPayment extends Model
         "is_active" => "boolean",
         "display_order" => "integer",
     ];
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

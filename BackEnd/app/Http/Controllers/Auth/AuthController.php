@@ -158,4 +158,5 @@ class  AuthController extends Controller
     {
         return response()->json(['token' => $token]);
     }
+    
 }

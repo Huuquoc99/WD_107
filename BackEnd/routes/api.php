@@ -1,22 +1,24 @@
 <?php
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Client\CartControler;
+use App\Models\ProductColor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ProductCapacity;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Client\CartControler;
+use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TrashedController;
 use App\Http\Controllers\Admin\CatalogueController;
+use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Admin\StatusOrderController;
 use App\Http\Controllers\Client\ClientUserController;
+use App\Http\Controllers\Admin\StatusPaymentController;
 use App\Http\Controllers\Client\CommentController as ClientCommentController;
-use App\Http\Controllers\Client\HomeController;
-use App\Models\ProductColor;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +53,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         Route::apiResource("admin/productColor", ProductColor::class);
         Route::apiResource("admin/banner", BannerController::class);
         Route::apiResource("admin/statusOrder", StatusOrderController::class);
+        Route::apiResource("admin/statusPayment", StatusPaymentController::class);
+        Route::apiResource('admin/products', ProductController::class);
 
 
         // Comment
@@ -92,6 +96,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // Comment
     Route::resource('products/{product_id}/comments', ClientCommentController::class);
 
+<<<<<<< HEAD
 // Cart
     Route::post('/product/add-to-cart',         [CartControler::class, 'addToCart']);
     Route::delete('/product/delete-cart/{id}',  [CartControler::class, 'deleteCart']);
@@ -107,3 +112,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
         ->middleware('auth:sanctum');
 
 
+=======
+    // // Cart
+    // // Route::post('/product/add-to-cart', [CartControler::class, 'addToCart']);
+    // Route::middleware('auth:sanctum')->post('/product/add-to-cart', [CartControler::class, 'addToCart']);
+
+    // // Checkout
+    // // Route::middleware(['auth'])->group(function () {
+    // //     Route::post('/checkout', [CheckoutController::class, 'checkout']);
+    // // });
+
+    // Route::middleware('auth:sanctum')->post('/checkout', [CheckoutController::class, 'checkout']);
+    
+>>>>>>> hoa04

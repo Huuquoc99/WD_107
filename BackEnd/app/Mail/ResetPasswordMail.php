@@ -16,7 +16,12 @@ class ResetPasswordMail extends Mailable
 
     public function __construct()
     {
+<<<<<<< HEAD
        
+=======
+        //
+        
+>>>>>>> hoa04
     }
     public function envelope(): Envelope
     {
