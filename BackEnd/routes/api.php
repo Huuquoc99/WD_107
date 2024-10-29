@@ -2,6 +2,7 @@
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Client\CartControler;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ProductCapacity;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
@@ -34,7 +35,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Auth
     Route::post("register", [AuthController::class, 'register']);
-    Route::post("login", [AuthController::class, 'login']);
+    Route::post("login", [AuthController::class, 'login'])->name('login');
     Route::post("logout", [AuthController::class, 'logout'])->middleware("auth:sanctum");
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
@@ -74,6 +75,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/shop/category/{id}', [ShopController::class, 'listProductsByCategory'])->name('shop.category');
 
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
+
+    Route::put('/user/{id}',                    [ClientUserController::class, 'updateUserInfo']);
+    Route::put('/user/{id}/password',           [ClientUserController::class, 'updatePassword']);
+    Route::get('/product/{slug}',               [ProductController::class, 'productDetail'])->name('product.detail');
+
+
+
     Route::put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}/password', [ClientUserController::class, 'updatePassword']);
 
@@ -83,5 +91,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // Comment
     Route::resource('products/{product_id}/comments', ClientCommentController::class);
 
-    // Cart
-    Route::post('/product/add-to-cart', [CartControler::class, 'addToCart']);
+// Cart
+    Route::post('/product/add-to-cart',         [CartControler::class, 'addToCart']);
+    Route::delete('/product/delete-cart/{id}',  [CartControler::class, 'deleteCart']);
+    Route::get('/product/list-cart',            [CartControler::class, 'list'])->name('cart.list');
+
+
+    Route::post('/product/add-to-cart',         [CartControler::class, 'addToCart'])
+        ->middleware('auth:sanctum');
+    Route::get('/product/list-cart',            [CartControler::class, 'list'])
+        ->middleware('auth:sanctum')
+        ->name('cart.list');
+    Route::delete('/product/delete-cart/{id}',  [CartControler::class, 'deleteCart'])
+        ->middleware('auth:sanctum');
+
+
