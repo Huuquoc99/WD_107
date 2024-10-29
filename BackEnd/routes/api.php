@@ -87,14 +87,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // Comment
     Route::resource('products/{product_id}/comments', ClientCommentController::class);
 
-    // Cart
-    // Route::post('/product/add-to-cart', [CartControler::class, 'addToCart']);
-    Route::middleware('auth:sanctum')->post('/product/add-to-cart', [CartControler::class, 'addToCart']);
+    // // Cart
+    // // Route::post('/product/add-to-cart', [CartControler::class, 'addToCart']);
+    // Route::middleware('auth:sanctum')->post('/product/add-to-cart', [CartControler::class, 'addToCart']);
 
-    // Checkout
-    // Route::middleware(['auth'])->group(function () {
-    //     Route::post('/checkout', [CheckoutController::class, 'checkout']);
-    // });
+    // // Checkout
+    // // Route::middleware(['auth'])->group(function () {
+    // //     Route::post('/checkout', [CheckoutController::class, 'checkout']);
+    // // });
 
-    Route::middleware('auth:sanctum')->post('/checkout', [CheckoutController::class, 'checkout']);
+    // Route::middleware('auth:sanctum')->post('/checkout', [CheckoutController::class, 'checkout']);
     
