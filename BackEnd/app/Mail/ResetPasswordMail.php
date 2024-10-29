@@ -19,6 +19,7 @@ class ResetPasswordMail extends Mailable
     public function __construct()
     {
         //
+        
     }
 
     /**
