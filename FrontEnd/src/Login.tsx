@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { User } from "./interfaces/user";
 
+// Định nghĩa schema cho việc xác thực
 const Schema = z.object({
   email: z.string().email("Địa chỉ email không hợp lệ"),
   password: z.string().min(8, "Mật khẩu phải có ít nhất 8 ký tự").max(20, "Mật khẩu tối đa 20 ký tự"),
@@ -12,6 +13,8 @@ const Schema = z.object({
 
 const Login = () => {
   const nav = useNavigate();
+  
+  // Khởi tạo useForm với schema xác thực
   const {
     register,
     handleSubmit,
@@ -20,10 +23,14 @@ const Login = () => {
     resolver: zodResolver(Schema),
   });
 
+  // Hàm xử lý khi người dùng submit form
   const onSubmit = async (user: User) => {
     try {
-      const { data } = await instance.post(`login`, user);
+      const { data } = await instance.post(`login`, user); // Gọi API đăng nhập
       localStorage.setItem("token", data.token); // Lưu token vào localStorage
+      localStorage.setItem("userRole", data.user.type); // Lưu vai trò người dùng vào localStorage
+      
+      // Chuyển hướng dựa trên vai trò
       if (data.user.type === 1) {
         nav("/admin"); // Chuyển hướng admin đến dashboard admin
       } else {
@@ -35,6 +42,7 @@ const Login = () => {
     }
   };
 
+  // Hàm xử lý khi người dùng muốn quên mật khẩu
   const handleForgotPassword = () => {
     nav("/forgot-password");
   };

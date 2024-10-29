@@ -6,17 +6,18 @@ const Auth = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
+    const type = localStorage.getItem("userType"); // Lấy vai trò từ localStorage
+    setIsAdmin(type === "1"); // Kiểm tra nếu vai trò là admin
+
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await instance.get("admin/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await instance.get("admin/users", {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        // console.log(response.data); // In dữ liệu ra console để kiểm tra
         setUsers(response.data);
       } catch (err) {
         setError("Không thể tải danh sách người dùng");
@@ -24,39 +25,11 @@ const Auth = () => {
         setLoading(false);
       }
     };
-
     fetchUsers();
   }, []);
 
-  const handleRoleChange = async (userId: number, newType: number) => {
-    try {
-      const token = localStorage.getItem("token"); // Lấy token để cập nhật quyền
-      await instance.put(
-        `/users/${userId}`,
-        { type: newType },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Gửi token vào header
-          },
-        }
-      );
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.id === userId ? { ...user, type: newType } : user
-        )
-      );
-    } catch (err) {
-      setError("Không thể cập nhật quyền truy cập");
-    }
-  };
-
-  if (loading) {
-    return <div>Đang tải...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
+  if (loading) return <div>Đang tải...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div>
@@ -68,33 +41,23 @@ const Auth = () => {
             <th>Tên</th>
             <th>Email</th>
             <th>Vai Trò</th>
-            <th>Hành Động</th>
+            {isAdmin && <th>Hành Động</th>} {/* Hiển thị cột hành động nếu là admin */}
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(users) && users.length > 0 ? (
-            users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.type === 1 ? "Admin" : "Người Dùng"}</td>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.id}</td>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>{user.type === 1 ? "Admin" : "Người Dùng"}</td>
+              {isAdmin && (
                 <td>
-                  <button
-                    onClick={() =>
-                      handleRoleChange(user.id, user.type === 1 ? 0 : 1)
-                    }
-                  >
-                    Chuyển thành {user.type === 1 ? "Người Dùng" : "Admin"}
-                  </button>
+                  <button>Chỉnh sửa</button>
                 </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={5}>Không có người dùng nào</td>
+              )}
             </tr>
-          )}
+          ))}
         </tbody>
       </table>
     </div>
