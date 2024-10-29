@@ -18,14 +18,14 @@ class CommentController extends Controller
     {
         $comment = Comment::findOrFail($id);
 
-        if ($comment->is_active == 1) {
-            return response()->json(['message' => 'Comments were previously moderated!'], 400);
+        if ($comment->is_active == 0) {
+            return response()->json(['message' => 'Comment is already hidden!'], 400);
         }
 
-        $comment->is_active = 1; // Duyệt bình luận
+        $comment->is_active = 0; // Ẩn bình luận
         $comment->save();
 
-        return response()->json(['message' => 'Comment has been approved successfully.'], 200);
+        return response()->json(['message' => 'Comment has been hidden successfully.'], 200);
     }
 
     public function destroy($id)
