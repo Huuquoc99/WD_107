@@ -36,9 +36,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Auth
     Route::post("register", [AuthController::class, 'register']);
-    Route::post("login", [AuthController::class, 'login']);
+    Route::post("login", [AuthController::class, 'login'])->name('login');
     Route::post("logout", [AuthController::class, 'logout'])->middleware("auth:sanctum");
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail']);
+    Route::post('/verify-code', [AuthController::class, 'verify']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])
         ->name('password.reset');
@@ -78,6 +79,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/shop/category/{id}', [ShopController::class, 'listProductsByCategory'])->name('shop.category');
 
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
+
+    Route::put('/user/{id}',                    [ClientUserController::class, 'updateUserInfo']);
+    Route::put('/user/{id}/password',           [ClientUserController::class, 'updatePassword']);
+    Route::get('/product/{slug}',               [ProductController::class, 'productDetail'])->name('product.detail');
+
+
+
     Route::put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}/password', [ClientUserController::class, 'updatePassword']);
 
@@ -86,3 +94,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
     // Comment
     Route::resource('products/{product_id}/comments', ClientCommentController::class);
+
+    // Cart
+    Route::post('/product/add-to-cart', [CartControler::class, 'addToCart']);
