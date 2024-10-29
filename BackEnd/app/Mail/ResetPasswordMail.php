@@ -11,46 +11,46 @@ use Illuminate\Queue\SerializesModels;
 
 class ResetPasswordMail extends Mailable
 {
-    // use Queueable, SerializesModels;
+    use Queueable, SerializesModels;
 
 
-    // public function __construct()
-    // {
+    public function __construct()
+    {
        
-    // }
-    // public function envelope(): Envelope
-    // {
-    //     return new Envelope(
-    //         subject: 'Reset Password Mail',
-    //     );
-    // }
-    // public function content(): Content
-    // {
-    //     return new Content(
-    //         view: 'view.name',
-    //     );
-    // }
-
-    // /**
-    //  * Get the attachments for the message.
-    //  *
-    //  * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-    //  */
-    // public function attachments(): array
-    // {
-    //     return [];
-    // }
-    public $verificationCode;
-
-    public function __construct($verificationCode)
-    {
-        $this->verificationCode = $verificationCode;
     }
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Reset Password Mail',
+        );
+    }
+    public function content(): Content
+    {
+        return new Content(
+            view: 'view.name',
+        );
+    }
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
+    public function attachments(): array
+    {
+        return [];
+    }
+    // public $verificationCode;
+
+    // public function __construct($verificationCode)
+    // {
+    //     $this->verificationCode = $verificationCode;
+    // }
     
-    public function build()
-    {
-        return $this->view('emails.verification_code')
-                    ->with(['verificationCode' => $this->verificationCode]);
-    }
+    // public function build()
+    // {
+    //     return $this->view('emails.verification_code')
+    //                 ->with(['verificationCode' => $this->verificationCode]);
+    // }
 
 }

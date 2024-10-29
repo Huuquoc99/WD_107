@@ -3,35 +3,26 @@ import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { instance } from "./api";
+import { instance } from "./api"; // Thay đổi đường dẫn nếu cần
 
 const EmailSchema = z.object({
-  email: z.string().email("Invalid email format").nonempty("Email is required"),
+  email: z.string().email("Email không hợp lệ"),
 });
 
 const CodeSchema = z.object({
-  email: z.string().email("Invalid email format").nonempty("Email is required"),
-  code: z.string().min(1, "Code is required"),
+  email: z.string().email("Email không hợp lệ"),
+  code: z.string().min(6, "Mã xác minh phải có ít nhất 6 ký tự"), // Điều chỉnh độ dài mã xác minh nếu cần
 });
 
 const ResetPasswordSchema = z
   .object({
-    email: z
-      .string()
-      .email("Invalid email format")
-      .nonempty("Email is required"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(20, "Password must not exceed 20 characters"),
-    password_confirmation: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(20, "Password must not exceed 20 characters"),
+    email: z.string().email("Email không hợp lệ"),
+    password: z.string().min(8, "Mật khẩu phải có ít nhất 8 ký tự"),
+    confirmPassword: z.string().min(8, "Xác nhận mật khẩu là bắt buộc"),
   })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "Passwords don't match",
-    path: ["password_confirmation"],
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Mật khẩu và xác nhận mật khẩu không khớp",
+    path: ["confirmPassword"],
   });
 
 const ForgotPassword = () => {
@@ -44,7 +35,11 @@ const ForgotPassword = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(
-      step === 1 ? EmailSchema : step === 2 ? CodeSchema : ResetPasswordSchema
+      step === 1
+        ? EmailSchema
+        : step === 2
+        ? CodeSchema
+        : ResetPasswordSchema
     ),
   });
 
@@ -54,12 +49,12 @@ const ForgotPassword = () => {
         const response = await instance.post("/forgot-password", {
           email: data.email,
         });
-        alert(response.data.message || "Verification code sent to your email.");
-        setStep(2); // Chuyển sang bước 2 để nhập mã xác minh
-        setEmail(data.email); // Lưu email để sử dụng trong bước 3
+        alert(response.data.status || "Mã xác minh đã được gửi đến email của bạn.");
+        setStep(2); // Chuyển sang bước nhập mã xác minh
+        setEmail(data.email); // Lưu email để sử dụng sau này
       } catch (error) {
         console.error("Error sending verification code:", error);
-        alert("Failed to send verification code. Please try again.");
+        alert(error.response?.data?.error || "Gửi mã xác minh không thành công. Vui lòng thử lại.");
       }
     } else if (step === 2) {
       try {
@@ -67,14 +62,11 @@ const ForgotPassword = () => {
           email,
           code: data.code,
         });
-        alert(
-          response.data.message ||
-            "Code verified! You can now reset your password."
-        );
-        setStep(3); // Chuyển sang bước 3 để đặt lại mật khẩu
+        alert(response.data.status || "Mã xác minh hợp lệ! Bạn có thể đặt lại mật khẩu.");
+        setStep(3); // Chuyển sang bước đặt lại mật khẩu
       } catch (error) {
         console.error("Error verifying code:", error);
-        alert("Invalid verification code. Please try again.");
+        alert(error.response?.data?.error || "Mã xác minh không hợp lệ. Vui lòng thử lại.");
       }
     } else {
       try {
@@ -82,11 +74,11 @@ const ForgotPassword = () => {
           email,
           password: data.password,
         });
-        alert(response.data.message || "Password reset successfully!");
-        nav("/login"); // Chuyển hướng về trang login sau khi reset thành công
+        alert(response.data.status || "Mật khẩu đã được đặt lại thành công!");
+        nav("/login"); // Chuyển hướng người dùng về trang đăng nhập
       } catch (error) {
         console.error("Error resetting password:", error);
-        alert("Failed to reset password. Please try again.");
+        alert(error.response?.data?.error || "Đặt lại mật khẩu không thành công. Vui lòng thử lại.");
       }
     }
   };
@@ -110,7 +102,7 @@ const ForgotPassword = () => {
               )}
             </div>
             <button className="btn btn-outline-secondary" type="submit">
-              Send Verification Code
+              Gửi Mã Xác Minh
             </button>
           </>
         )}
@@ -118,7 +110,7 @@ const ForgotPassword = () => {
           <>
             <div className="form-group">
               <label htmlFor="code" className="form-label">
-                Verification Code
+                Mã Xác Minh
               </label>
               <input
                 type="text"
@@ -130,7 +122,7 @@ const ForgotPassword = () => {
               )}
             </div>
             <button className="btn btn-outline-secondary" type="submit">
-              Verify Code
+              Xác Minh Mã
             </button>
           </>
         )}
@@ -138,7 +130,7 @@ const ForgotPassword = () => {
           <>
             <div className="form-group">
               <label htmlFor="password" className="form-label">
-                New Password
+                Mật Khẩu Mới
               </label>
               <input
                 type="password"
@@ -150,22 +142,20 @@ const ForgotPassword = () => {
               )}
             </div>
             <div className="form-group">
-              <label htmlFor="password_confirmation" className="form-label">
-                Confirm Password
+              <label htmlFor="confirmPassword" className="form-label">
+                Xác Nhận Mật Khẩu
               </label>
               <input
                 type="password"
                 className="form-control"
-                {...register("password_confirmation")}
+                {...register("confirmPassword")}
               />
-              {errors.password_confirmation && (
-                <span className="text-danger">
-                  {errors.password_confirmation.message}
-                </span>
+              {errors.confirmPassword && (
+                <span className="text-danger">{errors.confirmPassword.message}</span>
               )}
             </div>
             <button className="btn btn-outline-secondary" type="submit">
-              Reset Password
+              Đặt Lại Mật Khẩu
             </button>
           </>
         )}

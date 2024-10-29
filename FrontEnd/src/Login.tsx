@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
 import { z } from "zod";
 import { instance } from "./api";
 import { useForm } from "react-hook-form";
@@ -21,7 +20,7 @@ const Login = () => {
     resolver: zodResolver(Schema),
   });
 
-  const onSubmit = async (user) => {
+  const onSubmit = async (user: User) => {
     try {
       const { data } = await instance.post(`login`, user);
       localStorage.setItem("token", data.token);
@@ -41,7 +40,10 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div className="my-[110px] mx-auto max-w-[600px] p-8 sign-box backgound-two">
+       <h1 className="mb-4 text-xl text-center font-bold text-[#4E7C32]">
+          ĐĂNG NHẬP TÀI KHOẢN
+        </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
           <label htmlFor="email" className="form-label">Email</label>
@@ -54,7 +56,7 @@ const Login = () => {
           {errors.password && <span className="text-danger">{errors.password.message}</span>}
         </div>
         <button className="btn btn-outline-secondary">Login</button>
-        <button type="button" className="btn btn-link" onClick={handleForgotPassword}>
+        <button type="button" className="btn btn-link text-black" onClick={handleForgotPassword}>
           Forgot Password?
         </button>
       </form>

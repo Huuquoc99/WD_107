@@ -25,12 +25,15 @@ const Register = () => {
   } = useForm<User>({
     resolver: zodResolver(Schema),
   });
-  const onSubmit = async (user) => {
+  const onSubmit = async (user: User) => {
     const { data } = await instance.post(`register`, user);
     nav("/login");
   };
   return (
-    <div>
+    <div className="my-[110px] mx-auto max-w-[600px] p-8 sign-box backgound-two">
+       <h1 className="mb-4 text-xl text-center font-bold text-[#4E7C32]">
+          ĐĂNG KÝ TÀI KHOẢN
+        </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
           <label htmlFor="name" className="form-label">
@@ -87,6 +90,12 @@ const Register = () => {
 
         <button className="btn btn-outline-secondary">ADD</button>
       </form>
+      <div className="text-center mt-4">
+          Bạn đã có tài khoản?{" "}
+          <a href="/login" className="text-[#427c1d] underline">
+            Đăng nhập
+          </a>
+        </div>
     </div>
   );
 };

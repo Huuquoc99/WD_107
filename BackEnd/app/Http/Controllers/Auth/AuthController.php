@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use App\Mail\VerificationCodeMail;
 
 class AuthController extends Controller
 {
@@ -146,25 +150,68 @@ class AuthController extends Controller
         }
     }
 
-    public function verifyCode(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'code' => 'required|string|min:1',
-    ]);
+    public function sendResetLinkEmail(Request $request)
+    {
+        // Xác thực email
+        $request->validate(['email' => 'required|email']);
+        
+        // Gửi liên kết đặt lại mật khẩu
+        $response = Password::sendResetLink($request->only('email'));
+        
+        if ($response == Password::RESET_LINK_SENT) {
+            // Tạo mã xác minh
+            $verificationCode = rand(100000, 999999);
+            Cache::put('verification_code_' . $request->email, $verificationCode, 300); // Lưu mã trong cache trong 5 phút
+            
+            // Gửi mã xác minh qua email
+            Mail::to($request->email)->send(new VerificationCodeMail($verificationCode));
+            return response()->json(['status' => __($response), 'message' => 'Verification code sent to your email.']);
+        }
 
-    $resetRecord = DB::table('password_resets')
-        ->where('email', $request->email)
-        ->where('verification_code', $request->code)
-        ->first();
-
-    if (!$resetRecord) {
-        return response()->json(['message' => 'Invalid verification code'], 400);
+        return response()->json(['error' => __($response)], 422);
     }
 
-    return response()->json(['message' => 'Code verified successfully']);
-}
+    public function verify(Request $request)
+    {
+        // Xác thực mã xác minh
+        $request->validate([
+            'code' => 'required|integer',
+            'email' => 'required|email',
+        ]);
 
+        // Lấy mã xác minh từ cache
+        $expectedCode = Cache::get('verification_code_' . $request->email);
+
+        // Kiểm tra mã xác minh
+        if (!$expectedCode || $request->code != $expectedCode) {
+            return response()->json(['error' => 'Invalid verification code.'], 422);
+        }
+
+        return response()->json(['status' => 'Verification successful.']);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        // Xác thực dữ liệu đầu vào
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8', // Xác thực mật khẩu và xác nhận
+        ]);
+
+        // Tìm người dùng theo email
+        $user = DB::table('users')->where('email', $request->email)->first();
+
+        // Kiểm tra xem người dùng có tồn tại không
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        // Cập nhật mật khẩu mới
+        DB::table('users')->where('email', $request->email)->update(['password' => Hash::make($request->password)]);
+
+        return response()->json(['status' => 'Password has been reset successfully.']);
+    }
+    
 
     // Quên mật khẩu
     // public function forgotPassword(Request $request)
@@ -229,65 +276,35 @@ class AuthController extends Controller
     // }
 
     // Phương thức gửi link đặt lại mật khẩu
-    public function forgotPassword(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
+    // public function forgotPassword(Request $request)
+    // {
+    //     $request->validate(['email' => 'required|email']);
     
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json(['message' => 'Email not found'], 404);
-        }
+    //     $user = User::where('email', $request->email)->first();
+    //     if (!$user) {
+    //         return response()->json(['message' => 'Email not found'], 404);
+    //     }
     
        
-        $verificationCode = Str::random(6); // Ví dụ: 6 ký tự
-        DB::table('password_resets')->updateOrInsert(
-            ['email' => $request->email],
-            [
-                'verification_code' => $verificationCode,
-                'created_at' => now(),
-            ]
-        );
+    //     $verificationCode = Str::random(6); // Ví dụ: 6 ký tự
+    //     DB::table('password_resets')->updateOrInsert(
+    //         ['email' => $request->email],
+    //         [
+    //             'verification_code' => $verificationCode,
+    //             'created_at' => now(),
+    //         ]
+    //     );
     
-        // Gửi mã xác minh qua email
-        Mail::to($request->email)->send(new VerificationCodeMail($verificationCode));
+    //     // Gửi mã xác minh qua email
+    //     Mail::to($request->email)->send(new VerificationCodeMail($verificationCode));
     
-        return response()->json(['message' => 'Verification code sent to your email']);
-    }
+    //     return response()->json(['message' => 'Verification code sent to your email']);
+    // }
 
     // Phương thức đặt lại mật khẩu
    
 
-    public function resetPassword(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:8|max:20|confirmed',
-            'code' => 'required|string|min:1',
-        ]);
-    
-        $resetRecord = DB::table('password_resets')
-            ->where('email', $request->email)
-            ->where('verification_code', $request->code)
-            ->first();
-    
-        if (!$resetRecord) {
-            return response()->json(['message' => 'Invalid verification code'], 400);
-        }
-    
-        // Đặt lại mật khẩu
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            $user->password = Hash::make($request->password); // Mã hóa mật khẩu
-            $user->save();
-    
-            // Xóa bản ghi mã xác minh sau khi đặt lại mật khẩu thành công
-            DB::table('password_resets')->where('email', $request->email)->delete();
-    
-            return response()->json(['message' => 'Password reset successfully']);
-        }
-    
-        return response()->json(['message' => 'User not found'], 404);
-    }
+   
     
     
 
