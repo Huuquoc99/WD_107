@@ -50,14 +50,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}',                    [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}/password',           [ClientUserController::class, 'updatePassword']);
-//    Route::get('/product/{slug}',               [ProductController::class, 'productDetail'])->name('product.detail');
+    Route::get('/product/{slug}',               [ProductController::class, 'productDetail'])->name('product.detail');
+
+// Cart
     Route::post('/product/add-to-cart',         [CartControler::class, 'addToCart']);
+    Route::delete('/product/delete-cart/{id}',  [CartControler::class, 'deleteCart']);
     Route::get('/product/list-cart',            [CartControler::class, 'list'])->name('cart.list');
+
+
+    Route::post('/product/add-to-cart',         [CartControler::class, 'addToCart'])
+        ->middleware('auth:sanctum');
     Route::get('/product/list-cart',            [CartControler::class, 'list'])
         ->middleware('auth:sanctum')
         ->name('cart.list');
-    Route::post('/product/delete-cart/{id}',    [CartControler::class, 'deleteCart']);
+    Route::delete('/product/delete-cart/{id}',  [CartControler::class, 'deleteCart'])
+        ->middleware('auth:sanctum');
 
-Route::get('/auth/check', function () {
-    return response()->json(['logged_in' => Auth::check()], 200);
-})->middleware('auth:sanctum');
+

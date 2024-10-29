@@ -35,7 +35,7 @@ class CartControler extends Controller
                         'product_variant_id' => $productVariant->id,
                         'product_id' => $product->id,
                         'name' => $product->name,
-                        'price' => $product->price_sale ?? $product->price,
+                        'price' => $productVariant->price,
                         'quantity' => $item->quantity,
                         'color' => $productVariant->color->name,
                         'size' => $productVariant->capacity->name,
@@ -135,7 +135,7 @@ class CartControler extends Controller
                     'user_id' => Auth::id()
                 ]);
 
-                $cartItem = CartItem::where([
+                $cartItem = CartItem::query()->where([
                     'cart_id' => $cart->id,
                     'product_variant_id' => $productVariant->id
                 ])->first();
@@ -151,7 +151,7 @@ class CartControler extends Controller
                         'cart_id' => $cart->id,
                         'product_variant_id' => $productVariant->id,
                         'quantity' => $quantity,
-                        'price' => $product->price_sale,
+                        'price' => $productVariant->price
                     ]);
                 } else {
                     if (($cartItem->quantity + $quantity) > $stock_quantity) {
@@ -162,7 +162,7 @@ class CartControler extends Controller
 
                     $cartItem->update([
                         'quantity' => $cartItem->quantity + $quantity,
-                        'price' => $product->price_sale
+                        'price' => $productVariant->price
                     ]);
                 }
             }
@@ -191,7 +191,7 @@ class CartControler extends Controller
                     'product_variant_id' => $productVariant->id,
                     'product_id' => $product->id,
                     'name' => $product->name,
-                    'price' => $product->price_sale,
+                    'price' => $productVariant->price,
                     'quantity' => $quantity,
                     'color' => $productVariant->color->name,
                     'capacity' => $productVariant->capacity->name,
@@ -206,7 +206,7 @@ class CartControler extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Thêm vào giỏ hàng thành công',
-                'cart' => Auth::check() ? $cart->items : session()->get('cart')
+                'cart' => Auth::check() ? $cart : session()->get('cart')
             ], 201);
 
         }
@@ -217,6 +217,49 @@ class CartControler extends Controller
             return response()->json([
                 'error' => 'Có lỗi xảy ra, vui lòng thử lại',
                 'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteCart($id)
+    {
+        try {
+
+            if (Auth::check()) {
+
+                $cartItem = CartItem::query()
+                    ->where('product_variant_id', $id)
+                    ->whereHas('cart', function ($query) {
+                        $query->where('user_id', Auth::id());
+                    })
+                    ->firstOrFail();
+
+                $cartItem->delete();
+            } else {
+                // Người dùng chưa đăng nhập, xóa sản phẩm trong session
+                $cart = session()->get('cart', []);
+
+                if (isset($cart[$id])) {
+                    unset($cart[$id]);
+                    session()->put('cart', $cart);
+                } else {
+                    return response()->json([
+                        'error' => 'Không tìm thấy sản phẩm trong giỏ hàng'
+                    ], 404);
+                }
+            }
+
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Không tìm thấy sản phẩm trong giỏ hàng',
+                'detail' => $e->getMessage()
+            ], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Có lỗi xảy ra khi xóa sản phẩm',
+                'detail' => $e->getMessage()
             ], 500);
         }
     }
