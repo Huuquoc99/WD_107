@@ -9,10 +9,13 @@ import Client from "./layout/Client";
 import Auth from "./components/dashboard/Auth";
 
 function App() {
+
+
   return (
     <>
       <Routes>
         <Route>
+
           {/* client */}
           <Route path="/" element={<Client />}>
             <Route index element={<Home />} />
@@ -25,11 +28,13 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
           </Route>
+
+
+
           {/* admin */}
-          {/* product */}
           <Route path="/admin" element={<Dashboard />}>
             {/* <Route path="/admin/product" element={<ListProduct />} /> */}
-            <Route path="/admin/auth" element={<Auth />} />
+            <Route path="/admin/auth" element={<Auth  />} />
           </Route>
         </Route>
       </Routes>

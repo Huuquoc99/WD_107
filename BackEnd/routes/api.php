@@ -37,8 +37,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post("register", [AuthController::class, 'register']);
     Route::post("login", [AuthController::class, 'login'])->name('login');
     Route::post("logout", [AuthController::class, 'logout'])->middleware("auth:sanctum");
-    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail']);
-    Route::post('/verify-code', [AuthController::class, 'verify']);
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    // Route::post('/verify-code', [AuthController::class, 'verify']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])
         ->name('password.reset');
@@ -46,10 +46,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Admin
     Route::middleware(['auth:sanctum', 'checkAdminMiddleware'])->group(function () {
         Route::apiResource("admin/catalogue", CatalogueController::class);
-        // Route::apiResource("admin/user", UserController::class);
-        Route::middleware('auth:api')->group(function () {
-            Route::get('/admin/user', [UserController::class, 'index']);
-        });
+        Route::apiResource("admin/user", UserController::class);
+        // Route::middleware('auth:api')->group(function () {
+        //     Route::get('/admin/user', [UserController::class, 'index']);
+        // });
         
         Route::apiResource("admin/producCapacity", ProductCapacity::class);
         Route::apiResource("admin/productColor", ProductColor::class);
