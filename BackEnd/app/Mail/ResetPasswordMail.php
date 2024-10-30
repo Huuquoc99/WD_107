@@ -13,27 +13,22 @@ class ResetPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
+
     public function __construct()
     {
+<<<<<<< HEAD
+       
+=======
         //
+        
+>>>>>>> hoa04
     }
-
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
             subject: 'Reset Password Mail',
         );
     }
-
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -50,4 +45,17 @@ class ResetPasswordMail extends Mailable
     {
         return [];
     }
+    // public $verificationCode;
+
+    // public function __construct($verificationCode)
+    // {
+    //     $this->verificationCode = $verificationCode;
+    // }
+    
+    // public function build()
+    // {
+    //     return $this->view('emails.verification_code')
+    //                 ->with(['verificationCode' => $this->verificationCode]);
+    // }
+
 }
