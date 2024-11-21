@@ -1627,10 +1627,8 @@
       "role": "admin"
     },
     {
-      "email": "admin123@gmail.com",
-      "password": "$2a$10$0qWqdWGy340GEI0.k2ewgulozpXthKnp7SYsCN/KpM3.zZlpDRM4a",
-      "name": "HQQQQ",
-      "rPassword": "123456789",
+      "email": "admin@gmail.com",
+      "password": "$2a$10$3gpSsDf6naSiAzMxST0s6edNyaFetSxImNLsTuwarHULGwXhnjAdC",
       "id": 2
     }
   ]
