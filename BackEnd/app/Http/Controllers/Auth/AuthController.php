@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Password;
 
-class AuthController extends Controller
+class  AuthController extends Controller
 {
     // Đăng kí
     public function register()
@@ -39,7 +39,7 @@ class AuthController extends Controller
                 "errors" => $th->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    } 
+    }
 
     // Đăng nhập
     public function login()
@@ -52,28 +52,36 @@ class AuthController extends Controller
     
             $user = User::where("email", request("email"))->first();
     
-            if(!$user || !Hash::check(request("password"), $user->password)){
+            if (!$user || !Hash::check(request("password"), $user->password)) {
                 throw ValidationException::withMessages([
                     "email" => ["The provided credentials are incorrect"],
                 ]);
             }
+            
+            // Tạo token cho người dùng
             $token = $user->createToken($user->id)->plainTextToken;
     
             return response()->json([
-                "token" => $token
+                "token" => $token,
+                "user" => [ // Thêm thông tin người dùng vào phản hồi
+                    "id" => $user->id,
+                    "email" => $user->email,
+                    "type" => $user->type, // Cần đảm bảo trường `type` tồn tại trong model User
+                ]
             ]);
         } catch (\Throwable $th) {
-            if($th instanceof ValidationException){
+            if ($th instanceof ValidationException) {
                 return response()->json([
                     "errors" => $th->errors()
-                ], Response::HTTP_BAD_REQUEST); 
+                ], Response::HTTP_BAD_REQUEST);
             }
-
+    
             return response()->json([
                 "errors" => $th->getMessage()
             ], Response::HTTP_UNAUTHORIZED);
         }
     }
+    
 
     // Đăng xuất
     public function logout()
@@ -99,16 +107,16 @@ class AuthController extends Controller
             $request->validate([
                 'email' => 'required|email',
             ]);
-    
+
             // Gửi đường link thay đổi mật khẩu qua email
             $status = Password::sendResetLink(
                 $request->only('email')
             );
-    
+
             if ($status === Password::RESET_LINK_SENT) {
                 return response()->json(['message' => __($status)]);
             }
-    
+
             throw ValidationException::withMessages([
                 'email' => [trans($status)],
             ]);
@@ -127,7 +135,7 @@ class AuthController extends Controller
                 'token' => 'required',
                 'password' => 'required|min:8|confirmed',
             ]);
-    
+
             // Đặt lại mật khẩu
             $status = Password::reset(
                 $request->only('email', 'password', 'password_confirmation', 'token'),
@@ -137,11 +145,11 @@ class AuthController extends Controller
                     ])->save();
                 }
             );
-    
+
             if ($status == Password::PASSWORD_RESET) {
                 return response()->json(['message' => __($status)]);
             }
-    
+
             throw ValidationException::withMessages([
                 'email' => [trans($status)],
             ]);
@@ -151,7 +159,7 @@ class AuthController extends Controller
             ], 500);
         };
 
-        
+
     }
 
     public function showResetForm(Request $request, $token = null)

@@ -1,13 +1,21 @@
 <?php
-
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Client\CartControler;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\ProductCapacity;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\CatalogueController;
+use App\Http\Controllers\Client\ShopController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\TrashedController;
+use App\Http\Controllers\Admin\CatalogueController;
+use App\Http\Controllers\Admin\StatusOrderController;
 use App\Http\Controllers\Client\ClientUserController;
-use App\Models\ProductCapacity;
+use App\Http\Controllers\Client\CommentController as ClientCommentController;
+use App\Http\Controllers\Client\HomeController;
 use App\Models\ProductColor;
 
 /*
@@ -27,23 +35,83 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Auth
     Route::post("register", [AuthController::class, 'register']);
-    Route::post("login", [AuthController::class, 'login']);
+    Route::post("login", [AuthController::class, 'login'])->name('login');
     Route::post("logout", [AuthController::class, 'logout'])->middleware("auth:sanctum");
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    // Route::post('/verify-code', [AuthController::class, 'verify']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])
         ->name('password.reset');
 
 // Admin
-    Route::apiResource("admin/catalogue", CatalogueController::class);
-    Route::apiResource("admin/user", UserController::class);
-    Route::apiResource("admin/producCapacity", ProductCapacity::class);
-    Route::apiResource("admin/productColor", ProductColor::class);
-    Route::apiResource("admin/banner", BannerController::class);
-    
+    Route::middleware(['auth:sanctum', 'checkAdminMiddleware'])->group(function () {
+        Route::apiResource("admin/catalogue", CatalogueController::class);
+        // Route::apiResource("admin/user", UserController::class);
+        Route::middleware(['auth:sanctum', 'checkAdminMiddleware'])->group(function () {
+            Route::get('admin/users', [UserController::class, 'index']);
+        });
+        
+        // Route::middleware('auth:api')->group(function () {
+        //     Route::get('/admin/user', [UserController::class, 'index']);
+        // });
+        
+        Route::apiResource("admin/producCapacity", ProductCapacity::class);
+        Route::apiResource("admin/productColor", ProductColor::class);
+        Route::apiResource("admin/banner", BannerController::class);
+        Route::apiResource("admin/statusOrder", StatusOrderController::class);
+
+
+        // Comment
+        Route::get('/admin/comments', [CommentController::class, 'index']); 
+        Route::put('/admin/comments/approve/{id}', [CommentController::class, 'approve']); 
+        Route::delete('/admin/comments/{id}', [CommentController::class, 'destroy']); 
+
+        // Trash
+        Route::get('/admin/trashed', [TrashedController::class, 'trashed']);
+        Route::post('/admin/restore/{id}', [TrashedController::class, 'restore']);
+        // Route::delete('/admin/force-delete/{id}', [TrashedController::class, 'forceDelete']);
+    });
 
 
 // Client
+    // Home
+    Route::get("/home", [HomeController::class, "index"])->name("index");
+    
+    // List product
+    Route::get("/shop", [ShopController::class, "listProduct"])->name("product.shop");
+
+    // Filter by category
+    Route::get('/shop/category/{id}', [ShopController::class, 'listProductsByCategory'])->name('shop.category');
+
     // Route::middleware('auth:sanctum')->put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
+
+    Route::put('/user/{id}',                    [ClientUserController::class, 'updateUserInfo']);
+    Route::put('/user/{id}/password',           [ClientUserController::class, 'updatePassword']);
+    Route::get('/product/{slug}',               [ProductController::class, 'productDetail'])->name('product.detail');
+
+
+
     Route::put('/user/{id}', [ClientUserController::class, 'updateUserInfo']);
     Route::put('/user/{id}/password', [ClientUserController::class, 'updatePassword']);
+
+    // Detail product
+    Route::get('/product/{slug}',[\App\Http\Controllers\Client\ProductController::class, 'productDetail'])->name('product.detail');
+
+    // Comment
+    Route::resource('products/{product_id}/comments', ClientCommentController::class);
+
+// Cart
+    Route::post('/product/add-to-cart',         [CartControler::class, 'addToCart']);
+    Route::delete('/product/delete-cart/{id}',  [CartControler::class, 'deleteCart']);
+    Route::get('/product/list-cart',            [CartControler::class, 'list'])->name('cart.list');
+
+
+    Route::post('/product/add-to-cart',         [CartControler::class, 'addToCart'])
+        ->middleware('auth:sanctum');
+    Route::get('/product/list-cart',            [CartControler::class, 'list'])
+        ->middleware('auth:sanctum')
+        ->name('cart.list');
+    Route::delete('/product/delete-cart/{id}',  [CartControler::class, 'deleteCart'])
+        ->middleware('auth:sanctum');
+
+

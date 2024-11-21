@@ -11,12 +11,19 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index()
+    // {
+    //     $users = User::all();
+    //     $users = User::paginate(7);
+    //     return response()->json($users);
+    // }
+
     public function index()
     {
-        $users = User::all();
-        $users = User::paginate(7);
+        $users = User::all(); // Lấy tất cả người dùng
         return response()->json($users);
     }
+
 
     /**
      * Show the form for creating a new resource.
